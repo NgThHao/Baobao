@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<!-- Baobao Life: học từ vựng tiếng Trung. Cần đủ 5 file: index.html, manifest.json, sw.js, icon-192.png, icon-512.png -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Baobao Life - Học Từ Vựng Tiếng Trung Thông Minh</title>
+
+  <!-- Cấu hình PWA cho Android và iPhone -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Baobao Life">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              light: '#d1fae5', 
+              DEFAULT: '#10b981', 
+              dark: '#059669', 
+            }
+          },
+          fontFamily: {
+            sans: ['Quicksand', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap');
+    
+    body {
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+    .fade-in { animation: fadeIn 0.35s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bounce-in { animation: bounceIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
+    .modal-overlay { background-color: rgba(0,0,0,0.55); backdrop-filter: blur(5px); }
+
+    .dict-item {
+      background-color: #f9fafb;
+      border: 1px solid #f3f4f6;
+      transition: all 0.2s ease;
+    }
+    .dict-item:hover {
+      background-color: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+    .dark .dict-item {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+    }
+    .dark .dict-item:hover {
+      background-color: #334155 !important;
+    }
+    .dict-word-en { color: #1f2937; }
+    .dark .dict-word-en { color: #f8fafc !important; }
+    .dict-word-vi { color: #6b7280; }
+    .dark .dict-word-vi { color: #94a3b8 !important; }
+    .dict-ipa { color: #059669; }
+    .dark .dict-ipa { color: #34d399 !important; }
+
+    .cloze-input {
+      display: inline-block;
+      width: auto;
+      min-width: 60px;
+      border-bottom: 2px solid #10b981;
+      background: transparent;
+      text-align: center;
+      font-weight: bold;
+      color: #059669;
+      outline: none;
+      padding: 0 4px;
+      margin: 0 2px;
+      transition: all 0.3s ease;
+    }
+    .dark .cloze-input { color: #34d399 !important; }
+    .cloze-input.correct { border-bottom-color: #22c55e; color: #16a34a; }
+    .dark .cloze-input.correct { color: #4ade80 !important; }
+    .cloze-input.wrong { border-bottom-color: #ef4444; color: #dc2626; animation: shake 0.4s; }
+    .dark .cloze-input.wrong { color: #f87171 !important; }
+
+    /* Màu theo thanh điệu (1 đỏ, 2 xanh lá, 3 xanh dương, 4 tím, 5 xám) */
+    .tone1 { color: #ef4444; } .tone2 { color: #16a34a; } .tone3 { color: #2563eb; } .tone4 { color: #9333ea; } .tone5 { color: #6b7280; }
+    .dark .tone1 { color: #f87171; } .dark .tone2 { color: #4ade80; } .dark .tone3 { color: #60a5fa; } .dark .tone4 { color: #c084fc; } .dark .tone5 { color: #9ca3af; }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+  <div class="app-container bg-[#fcfcfc] dark:bg-gray-900 flex flex-col">
+
+    <!-- VIEW 1: TRANG CHỦ -->
+    <div id="view-dashboard" class="flex-1 flex flex-col p-5 pb-24 fade-in">
+      
+      <!-- Header & Single Gear Settings Button -->
+      <header class="flex justify-between items-center mb-6 relative">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <span class="text-2xl leading-none">🐼</span> Baobao Life <span class="text-xs bg-emerald-100 dark:bg-emerald-900/60 text-brand dark:text-emerald-300 font-extrabold px-2 py-0.5 rounded-full">AI</span>
+          </h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Học tiếng Trung theo ngữ cảnh, nhớ lâu hơn</p>
+        </div>
+
+        <!-- Biểu tượng Bánh Răng duy nhất -->
+        <div class="relative">
+          <button id="btn-settings-toggle" onclick="toggleSettingsMenu(event)" title="Cài đặt" class="w-11 h-11 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:scale-105 active:scale-95 transition-all">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+
+          <!-- Dropdown Menu 4 Lựa chọn -->
+          <div id="settings-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2 z-50 fade-in">
+            <!-- 1. Chế độ Sáng/Tối -->
+            <button onclick="toggleDarkMode(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors">
+              <i class="fa-solid fa-moon text-emerald-500 dark:hidden w-5 text-center"></i>
+              <i class="fa-solid fa-sun text-emerald-400 hidden dark:inline-block w-5 text-center"></i>
+              <span id="theme-text">Chế độ Sáng / Tối</span>
+            </button>
+
+            <!-- 2. Nhập API Key -->
+            <button onclick="openAISettingsModal(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors">
+              <i class="fa-solid fa-key text-brand w-5 text-center"></i>
+              <span>Nhập Gemini Key</span>
+            </button>
+
+            <!-- 3. Bật/Tắt Nhắc nhở -->
+            <button onclick="toggleNotifications(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors">
+              <i class="fa-solid fa-bell text-blue-500 w-5 text-center"></i>
+              <span id="notify-text">Nhắc nhở học tập</span>
+            </button>
+
+            <!-- Màu theo thanh điệu -->
+            <button onclick="toggleToneColor(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors">
+              <i class="fa-solid fa-palette text-purple-500 w-5 text-center"></i>
+              <span id="tonecolor-text">Màu theo thanh điệu</span>
+            </button>
+
+            <!-- Cài đặt ứng dụng -->
+            <button onclick="openInstallModal(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors">
+              <i class="fa-solid fa-download text-sky-500 w-5 text-center"></i>
+              <span>Cài đặt ứng dụng</span>
+            </button>
+
+            <!-- 4. Quản lý Dữ liệu JSON (Xuất/Nhập) -->
+            <button onclick="openJsonModal(); closeSettingsMenu();" class="w-full text-left px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors border-t border-gray-100 dark:border-gray-700/60 mt-1 pt-3">
+              <i class="fa-solid fa-file-code text-green-500 w-5 text-center"></i>
+              <span>Xuất / Nhập JSON</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Khối Thời Điểm Vàng -->
+      <div class="bg-gradient-to-br from-emerald-400 to-teal-500 dark:from-emerald-600 dark:to-teal-700 rounded-3xl p-6 text-white shadow-lg mb-8 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 text-white/20 text-8xl">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="relative z-10">
+          <h2 class="text-lg font-bold mb-1"><i class="fa-solid fa-bolt mr-2"></i>Thời Điểm Vàng</h2>
+          <p class="mb-4 text-emerald-50/90 text-sm">Thuật toán SR đã lọc các từ sắp quên.</p>
+          
+          <div class="flex items-center justify-between bg-white/20 p-3 rounded-2xl backdrop-blur-sm mb-4">
+            <span class="font-semibold">Cần ôn tập ngay:</span>
+            <span class="text-2xl font-bold" id="due-count">0</span>
+          </div>
+          
+          <button id="btn-start-learning" onclick="startLearning()" class="w-full bg-white dark:bg-gray-800 text-brand-dark dark:text-brand font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2">
+            BẮT ĐẦU HỌC <i class="fa-solid fa-play text-sm"></i>
+          </button>
+
+          <button id="btn-daily-exercise" onclick="openDailyExercise()" class="w-full mt-3 bg-emerald-100 dark:bg-gray-800/80 text-brand-dark dark:text-emerald-400 font-bold py-3.5 rounded-2xl shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2 border border-emerald-200/50 dark:border-gray-700">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> LUYỆN TẬP VỚI AI
+          </button>
+        </div>
+      </div>
+
+      <!-- Thống kê Cấp Độ -->
+      <div class="mb-8">
+        <h3 class="text-sm font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mb-4">Tiến độ ghi nhớ</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 space-y-3" id="level-stats">
+          <!-- Render từ JS -->
+        </div>
+      </div>
+
+      <!-- Sổ Từ Vựng -->
+      <div class="flex-1 flex flex-col relative min-h-[300px]">
+        <div class="flex justify-between items-end mb-4">
+          <h3 class="text-sm font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest">Sổ Từ Vựng (<span id="total-words">0</span>)</h3>
+        </div>
+        
+        <!-- Thanh tìm kiếm & Lọc -->
+        <div class="flex gap-2 mb-4">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="search-input" oninput="renderDictionary()" placeholder="Tìm chữ Hán, pinyin, nghĩa..." class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-brand transition-all">
+          </div>
+          <select id="filter-level" onchange="renderDictionary()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 text-sm rounded-xl px-3 focus:outline-none focus:border-brand">
+            <option value="all">Tất cả cấp</option>
+            <option value="favorite" class="text-red-500 font-bold">❤ Yêu thích</option>
+            <option value="1">Cấp 1</option>
+            <option value="2">Cấp 2</option>
+            <option value="3">Cấp 3</option>
+            <option value="4">Cấp 4</option>
+            <option value="5">Cấp 5</option>
+          </select>
+          <select id="filter-hsk" onchange="renderDictionary()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 text-xs rounded-xl px-2 focus:outline-none focus:border-brand">
+            <option value="all">Mọi HSK</option>
+            <option value="1">HSK 1</option>
+            <option value="2">HSK 2</option>
+            <option value="3">HSK 3</option>
+            <option value="4">HSK 4</option>
+            <option value="5">HSK 5</option>
+            <option value="6">HSK 6</option>
+            <option value="0">Chưa gắn</option>
+          </select>
+        </div>
+
+        <!-- Danh sách từ -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 overflow-y-auto max-h-[400px]">
+          <ul id="dictionary-list" class="space-y-2">
+            <!-- Render từ JS -->
+          </ul>
+        </div>
+        
+        <!-- Nút thêm từ vựng nổi -->
+        <button onclick="openAddModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-brand text-white rounded-full shadow-2xl flex justify-center items-center text-2xl hover:scale-105 active:scale-95 transition-transform z-30">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 2: HỌC TẬP FLASHCARD (Đã đồng bộ hóa cấu trúc câu hỏi giống file cũ) -->
+    <div id="view-learning" class="hidden flex-1 flex-col bg-[#fcfcfc] dark:bg-gray-900 h-screen fixed inset-0 z-40 max-w-[480px] mx-auto w-full overflow-y-auto">
+      <div class="p-5 flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-[#fcfcfc] dark:bg-gray-900 z-10">
+        <button onclick="quitLearning()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl p-2 transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+          <div id="learning-progress" class="h-full bg-brand transition-all duration-300 w-0 rounded-full"></div>
+        </div>
+        <span id="learning-counter" class="text-sm font-bold text-gray-500 dark:text-gray-400 font-mono">0/0</span>
+      </div>
+
+      <div class="flex-1 flex flex-col p-6 items-center justify-center relative my-auto">
+        <div id="feedback-icon" class="absolute top-2 text-6xl opacity-0 transition-opacity duration-200 z-10"></div>
+        <div id="flashcard" class="w-full text-center mb-6 bounce-in">
+          <span class="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-900/50 text-brand dark:text-emerald-300 rounded-full text-xs font-bold mb-2 uppercase tracking-wider" id="card-level">Cấp độ</span>
+          <p id="question-hint" class="text-gray-500 dark:text-gray-400 font-semibold text-xs mb-1 uppercase tracking-widest"></p>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-white mb-1" id="card-word">Word</h2>
+          <div id="card-pinyin" class="hidden text-xl font-bold mb-0.5"></div>
+          <div id="card-hv" class="hidden text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3"></div>
+          
+          <div id="card-example-box" class="mt-2 p-3.5 bg-emerald-50/80 dark:bg-gray-800 rounded-2xl border border-emerald-200/80 dark:border-gray-700 text-left max-w-md mx-auto shadow-sm">
+            <p class="text-[10px] font-bold text-brand dark:text-emerald-400 uppercase tracking-wider mb-1"><i class="fa-solid fa-quote-left mr-1"></i> Ví dụ ngữ cảnh</p>
+            <p id="card-example-zh" class="font-bold text-gray-800 dark:text-gray-100 text-lg leading-relaxed"></p>
+            <p id="card-example-pinyin" class="text-sm font-semibold mt-0.5"></p>
+            <p id="card-example-vi" class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium"></p>
+          </div>
+          
+          <button id="btn-play-audio" class="hidden mt-3 mx-auto w-10 h-10 bg-emerald-100 text-brand dark:bg-emerald-900/60 dark:text-emerald-300 rounded-full flex items-center justify-center text-base hover:scale-110 transition-transform shadow-sm">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+        <div class="w-full space-y-2.5 mt-2" id="answer-area">
+          <!-- Render từ JS -->
+        </div>
+      </div>
+      <!-- Khoảng trống để bảng phản hồi không che các đáp án -->
+      <div id="feedback-spacer" class="hidden shrink-0 h-[340px]"></div>
+
+      <!-- BẢNG PHẢN HỒI ĐÚNG / SAI -->
+      <div id="feedback-sheet" class="hidden fixed bottom-0 left-0 right-0 mx-auto w-full max-w-[480px] z-50">
+        <div id="feedback-sheet-inner" class="translate-y-full transition-transform duration-300 ease-out rounded-t-3xl border-t-4 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-5 pt-4 pb-5">
+          <div class="flex items-center gap-2 mb-2">
+            <div id="fs-icon" class="text-2xl"></div>
+            <h3 id="fs-title" class="text-lg font-extrabold flex-1"></h3>
+            <span id="fs-level" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/70 dark:bg-gray-900/40"></span>
+            <button id="fs-heart" onclick="toggleFavoriteInSheet()" class="w-10 h-10 rounded-full bg-white/80 dark:bg-gray-900/50 flex items-center justify-center text-lg shadow-sm active:scale-90 transition-transform" aria-label="Thêm vào yêu thích">
+              <i class="fa-regular fa-heart text-red-400"></i>
+            </button>
+          </div>
+
+          <div class="bg-white/80 dark:bg-gray-900/50 rounded-2xl p-3.5 mb-3 max-h-[210px] overflow-y-auto">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="fs-zh" class="text-3xl font-extrabold text-gray-800 dark:text-white"></span>
+              <span id="fs-pinyin" class="text-base font-bold"></span>
+              <button onclick="playAudio(currentFeedbackWord && currentFeedbackWord.zh)" class="w-8 h-8 rounded-full bg-emerald-100 text-brand dark:bg-emerald-900/60 dark:text-emerald-300 flex items-center justify-center text-sm" aria-label="Nghe phát âm">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+            <p id="fs-hv" class="hidden text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1"></p>
+            <p id="fs-typed" class="hidden text-xs text-gray-500 dark:text-gray-400 mt-1"></p>
+            <p id="fs-vi" class="font-bold text-gray-700 dark:text-gray-200 mt-1"></p>
+            <div id="fs-example" class="hidden mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <p id="fs-example-zh" class="text-base font-bold text-gray-800 dark:text-gray-100 leading-relaxed"></p>
+              <p id="fs-example-pinyin" class="text-xs font-semibold mt-0.5"></p>
+              <p id="fs-example-vi" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"></p>
+            </div>
+          </div>
+
+          <button id="fs-continue" onclick="continueAfterFeedback()" class="w-full text-white font-extrabold py-3.5 rounded-2xl shadow-md active:scale-95 transition-transform text-sm tracking-wide">TIẾP TỤC</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: LUYỆN TẬP VỚI AI -->
+    <div id="view-daily-exercise" class="hidden flex-1 flex-col bg-[#fcfcfc] dark:bg-gray-900 h-screen fixed inset-0 z-40 max-w-[480px] mx-auto w-full overflow-y-auto pb-10">
+      <div class="p-5 flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10">
+        <button onclick="closeDailyExercise()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl p-2 transition-colors">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <h2 class="flex-1 text-lg font-bold text-center text-gray-800 dark:text-white">Thực Hành AI</h2>
+        <button onclick="refreshDailyExercise()" id="btn-refresh-exercise" title="Tạo bài tập mới" class="w-10 h-10 bg-emerald-50 text-emerald-600 dark:bg-gray-800 dark:text-emerald-400 rounded-full flex items-center justify-center text-lg shadow-sm hover:bg-emerald-100 transition-colors border border-emerald-200 dark:border-gray-700">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+
+      <div class="p-5">
+        <div class="bg-brand text-white rounded-3xl p-5 shadow-md mb-6 relative overflow-hidden fade-in">
+          <i class="fa-solid fa-book-open absolute -right-4 -bottom-4 text-white/20 text-7xl"></i>
+          <h3 class="text-sm font-bold mb-2 opacity-90"><i class="fa-solid fa-list-check mr-2"></i>Từ vựng ôn tập:</h3>
+          <div id="exercise-word-list" class="flex flex-wrap gap-2 relative z-10">
+            <!-- Render danh sách từ -->
+          </div>
+        </div>
+
+        <div id="exercise-loading" class="hidden flex-col items-center justify-center py-12 fade-in">
+          <div class="w-12 h-12 border-4 border-emerald-200 border-t-brand rounded-full animate-spin mb-4"></div>
+          <p class="text-gray-500 dark:text-gray-400 font-medium text-center">AI đang sáng tác câu chuyện<br>dành riêng cho bạn...</p>
+        </div>
+
+        <div id="exercise-content" class="hidden fade-in space-y-6">
+          <div>
+            <div class="flex justify-between items-end mb-3">
+              <h3 class="font-bold text-gray-800 dark:text-white text-lg flex items-center gap-2">
+                <span class="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span> 
+                Điền từ vào chỗ trống
+              </h3>
+              <button onclick="playExerciseAudio()" title="Nghe đoạn văn" class="text-brand hover:scale-110 transition-transform">
+                <i class="fa-solid fa-volume-high text-xl"></i>
+              </button>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <p id="cloze-paragraph" class="text-gray-800 dark:text-gray-100 text-lg leading-relaxed font-medium mb-4">
+                <!-- Nội dung đục lỗ -->
+              </p>
+              
+              <button id="btn-check-cloze" onclick="checkClozeTest()" class="w-full bg-brand text-white font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform mb-4">
+                KIỂM TRA ĐÁP ÁN
+              </button>
+
+              <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
+                <button onclick="toggleExerciseTranslation()" class="text-sm font-bold text-gray-500 hover:text-gray-700 dark:text-gray-400 flex items-center gap-2 w-full justify-center">
+                  <i class="fa-solid fa-eye-slash" id="trans-icon"></i> <span id="trans-text">Hiện pinyin &amp; bản dịch</span>
+                </button>
+                <div id="exercise-translation" class="hidden mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl text-gray-700 dark:text-gray-200 text-sm">
+                  <!-- Bản dịch -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-gray-800 dark:text-white text-lg flex items-center gap-2 mb-3">
+              <span class="bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span> 
+              Vận dụng (Tự luận)
+            </h3>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Hãy chọn 2-3 từ ở trên và tự viết một câu tiếng Trung (chữ Hán hoặc pinyin đều được). AI sẽ chấm điểm và sửa lỗi cho bạn.</p>
+              
+              <textarea id="writing-input" oninput="saveExerciseSession()" rows="3" placeholder="Ví dụ: 我有很多好朋友。" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand dark:text-white mb-3 resize-none"></textarea>
+              
+              <button id="btn-submit-writing" onclick="submitWritingTask()" class="w-full bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-800 font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-all flex justify-center items-center gap-2">
+                <i class="fa-solid fa-spell-check"></i> CHẤM ĐIỂM
+              </button>
+
+              <div id="writing-feedback-area" class="hidden mt-4 p-4 rounded-xl border">
+                <div class="flex items-center gap-2 mb-2 font-bold" id="feedback-title">
+                  <!-- Score -->
+                </div>
+                <p id="feedback-text" class="text-sm mb-2 text-gray-700 dark:text-gray-300"></p>
+                <div id="feedback-correction" class="text-sm font-medium bg-white/50 dark:bg-black/20 p-2 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: KẾT QUẢ FLASHCARD -->
+    <div id="view-summary" class="hidden flex-1 flex-col p-6 items-center justify-center h-screen fixed inset-0 z-50 bg-brand dark:bg-emerald-600 max-w-[480px] mx-auto w-full text-white">
+      <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-5xl mb-6 bounce-in">
+        <i class="fa-solid fa-award"></i>
+      </div>
+      <h2 class="text-3xl font-extrabold mb-2 text-center">Hoàn Thành!</h2>
+      <p class="text-emerald-100 mb-8 text-center text-sm">Bộ não của bạn đã ghi nhớ từ vựng qua ngữ cảnh sâu hơn.</p>
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 w-full text-gray-800 dark:text-gray-100 shadow-lg mb-8 fade-in">
+        <div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+          <span class="text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-bullseye mr-2 text-blue-500"></i>Độ chính xác</span>
+          <span class="text-xl font-bold" id="sum-accuracy">100%</span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+          <span class="text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-bolt mr-2 text-emerald-500"></i>Phản xạ TB</span>
+          <span class="text-xl font-bold" id="sum-speed">1.5s</span>
+        </div>
+        <div class="flex justify-between items-center py-3">
+          <span class="text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-arrow-trend-up mr-2 text-green-500"></i>Từ tăng cấp</span>
+          <span class="text-xl font-bold text-green-500" id="sum-levelup">0</span>
+        </div>
+      </div>
+      <button onclick="backToDashboard()" class="w-full bg-white dark:bg-gray-900 text-brand-dark dark:text-brand font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform">
+        VỀ TRANG CHỦ
+      </button>
+    </div>
+
+    <!-- MODAL 1: CÀI ĐẶT GEMINI API KEY -->
+    <div id="modal-ai-settings" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300 p-4">
+      <div class="bg-white dark:bg-gray-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl transition-transform transform scale-95" id="modal-ai-content">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-robot text-brand"></i> Cài đặt Gemini API Key
+          </h3>
+          <button onclick="closeAISettingsModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+          Nhập Gemini API Key miễn phí từ Google để kích hoạt AI tạo bài tập sinh động, đục lỗ văn bản và chấm điểm tự luận.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Gemini API Key</label>
+            <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand dark:text-white">
+          </div>
+
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="inline-block text-xs text-brand hover:underline font-semibold">
+            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Lấy Gemini Key miễn phí ở đâu?
+          </a>
+
+          <div class="flex gap-2 pt-2">
+            <button onclick="saveApiKey()" class="flex-1 bg-brand text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform text-sm">
+              LƯU API KEY
+            </button>
+            <button onclick="removeApiKey()" class="bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400 px-3 py-3 rounded-xl text-sm font-semibold hover:bg-red-100">
+              Xóa Key
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: XUẤT / NHẬP JSON DỮ LIỆU -->
+    <div id="modal-install" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300 p-4">
+      <div class="bg-white dark:bg-gray-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl transition-transform transform scale-95 max-h-[90vh] overflow-y-auto" id="modal-install-content">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-download text-brand"></i> Cài đặt ứng dụng
+          </h3>
+          <button onclick="closeInstallModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <p id="install-status" class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-3 leading-relaxed"></p>
+        <button id="btn-install-now" onclick="installApp()" class="hidden w-full bg-brand text-white font-extrabold py-3 rounded-xl shadow-md active:scale-95 transition-transform mb-3 text-sm">CÀI ĐẶT NGAY</button>
+        <ul id="install-checks" class="space-y-1.5 text-xs text-gray-700 dark:text-gray-200 mb-3"></ul>
+        <div id="install-help" class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4"></div>
+        <button onclick="runInstallCheck()" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold py-2.5 rounded-xl text-sm"><i class="fa-solid fa-rotate-right mr-1"></i> Kiểm tra lại</button>
+      </div>
+    </div>
+
+    <div id="modal-json" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300 p-4">
+      <div class="bg-white dark:bg-gray-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl transition-transform transform scale-95" id="modal-json-content">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-file-code text-green-500"></i> Quản Lý Dữ Liệu JSON
+          </h3>
+          <button onclick="closeJsonModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+          Sao lưu toàn bộ sổ từ vựng hiện tại ra tệp JSON hoặc khôi phục dữ liệu từ tệp JSON cũ.
+        </p>
+
+        <div class="space-y-3">
+          <button onclick="exportJSON()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download"></i> XUẤT DỮ LIỆU (DOWNLOAD)
+          </button>
+
+          <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 text-center hover:border-brand transition-colors">
+            <input type="file" id="import-file-input" accept=".json,application/json,text/plain" onchange="importJSON(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            <div class="text-gray-500 dark:text-gray-400">
+              <i class="fa-solid fa-upload text-2xl text-brand mb-1"></i>
+              <p class="text-xs font-bold">Bấm vào đây để chọn tệp JSON</p>
+              <p class="text-[10px]">Chỉ hỗ trợ tệp đuôi .json</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: THÊM / SỬA TỪ VỰNG -->
+    <div id="modal-add-word" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300">
+      <div class="bg-white dark:bg-gray-800 w-full sm:max-w-sm sm:rounded-3xl rounded-t-3xl p-6 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="modal-add-content">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white" id="modal-add-title">Thêm từ mới</h3>
+          <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        
+        <input type="hidden" id="edit-word-id" value="">
+
+        <div class="space-y-3.5">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-300">Chữ Hán (giản thể) *</label>
+              <button onclick="autoFillWithAI()" id="btn-ai-fill" class="text-xs text-brand hover:text-brand-dark font-extrabold flex items-center gap-1 bg-emerald-50 dark:bg-emerald-900/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Tự Điền
+              </button>
+            </div>
+            <input type="text" id="new-zh" placeholder="vd: 朋友 (hoặc gõ pinyin / nghĩa rồi bấm AI)" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand dark:text-white font-semibold text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Pinyin (cách nhau từng âm tiết)</label>
+            <input type="text" id="new-pinyin" placeholder="vd: péng you" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 font-semibold text-emerald-600 dark:text-emerald-400 text-sm focus:outline-none focus:border-brand">
+          </div>
+
+          <div class="flex gap-3">
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Âm Hán Việt</label>
+              <input type="text" id="new-hv" placeholder="vd: bằng hữu" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+            </div>
+            <div class="w-28">
+              <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Cấp HSK</label>
+              <select id="new-hsk" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+                <option value="">—</option>
+                <option value="1">HSK 1</option>
+                <option value="2">HSK 2</option>
+                <option value="3">HSK 3</option>
+                <option value="4">HSK 4</option>
+                <option value="5">HSK 5</option>
+                <option value="6">HSK 6</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Nghĩa Tiếng Việt *</label>
+            <input type="text" id="new-vi" placeholder="vd: Bạn bè" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Câu ví dụ (chữ Hán)</label>
+            <input type="text" id="new-example-zh" placeholder="vd: 他是我的好朋友。" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Pinyin câu ví dụ</label>
+            <input type="text" id="new-example-pinyin" placeholder="vd: tā shì wǒ de hǎo péng you." class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Dịch câu ví dụ (Tiếng Việt)</label>
+            <input type="text" id="new-example-vi" placeholder="vd: Anh ấy là bạn tốt của tôi." class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand dark:text-white">
+          </div>
+
+          <button onclick="saveNewWord()" class="w-full bg-brand text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition-transform mt-2 text-sm">
+            LƯU TỪ VỰNG
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: CHI TIẾT TỪ VỰNG -->
+    <div id="modal-word-detail" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300 p-4">
+      <div class="bg-white dark:bg-gray-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl transition-all transform scale-95 relative border border-emerald-100 dark:border-gray-700 max-h-[92vh] overflow-y-auto" id="modal-detail-content">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
+          <span id="detail-level-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-100 text-brand dark:bg-emerald-900/50 dark:text-emerald-300">
+            Cấp 1
+          </span>
+          <div class="flex gap-2">
+            <button id="btn-detail-favorite" class="w-8 h-8 rounded-full bg-red-50 dark:bg-gray-700 text-red-400 hover:text-red-500 flex items-center justify-center transition-colors">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <button onclick="closeWordDetailModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-white flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="text-center mb-5">
+          <div class="flex items-center justify-center gap-3 mb-1">
+            <h2 id="detail-word-zh" class="text-5xl font-extrabold text-gray-800 dark:text-white tracking-tight">词</h2>
+            <button id="btn-detail-speech" title="Phát âm" class="w-10 h-10 bg-emerald-100 text-brand dark:bg-emerald-900/60 dark:text-emerald-300 rounded-full flex items-center justify-center text-lg hover:scale-110 active:scale-95 transition-transform shadow-sm">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+          <div id="detail-word-pinyin" class="text-lg font-bold"></div>
+          <div class="flex items-center justify-center gap-2 mt-1.5">
+            <span id="detail-word-hv" class="hidden text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400"></span>
+            <span id="detail-hsk" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-300"></span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 mb-4 border border-gray-100 dark:border-gray-700">
+          <p class="text-xs font-bold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-language text-brand"></i> Nghĩa tiếng Việt
+          </p>
+          <p id="detail-word-vi" class="text-lg font-bold text-gray-800 dark:text-white"></p>
+        </div>
+
+        <div id="stroke-area" class="hidden bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-3 mb-4 border border-gray-100 dark:border-gray-700 text-center">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-pen-nib text-brand mr-1"></i> Thứ tự nét viết</p>
+          <div id="stroke-chars" class="flex flex-wrap gap-2 justify-center"></div>
+          <button onclick="replayStrokeOrder()" class="mt-3 text-xs font-bold text-brand hover:underline"><i class="fa-solid fa-rotate-right mr-1"></i> Xem lại</button>
+        </div>
+
+        <div id="detail-example-section" class="bg-emerald-50/80 dark:bg-gray-800 rounded-2xl p-4 border border-emerald-200/80 dark:border-gray-700/80 mb-5 relative">
+          <p class="text-xs font-bold text-brand dark:text-emerald-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-quote-left mr-1"></i> Câu ví dụ</span>
+            <button id="btn-detail-example-speech" title="Nghe câu ví dụ" class="text-emerald-600 dark:text-emerald-300 hover:scale-110 transition-transform text-sm">
+              <i class="fa-solid fa-volume-high"></i> Nghe câu
+            </button>
+          </p>
+          <p id="detail-example-zh" class="text-base font-bold text-gray-800 dark:text-gray-100 leading-relaxed"></p>
+          <p id="detail-example-pinyin" class="text-xs font-semibold mt-0.5 mb-2"></p>
+          <div class="h-px bg-emerald-200/60 dark:bg-gray-700 my-2"></div>
+          <p id="detail-example-vi" class="text-xs text-gray-600 dark:text-gray-300 font-medium"></p>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="btn-detail-stroke" onclick="toggleStrokeOrder()" class="flex-1 bg-sky-50 dark:bg-sky-900/30 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-600 dark:text-sky-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-pen-nib"></i> Nét viết
+          </button>
+          <button id="btn-detail-edit" class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa
+          </button>
+          <button id="btn-detail-delete" class="bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-trash-can"></i> Xóa từ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 5: XÁC NHẬN THOÁT HỌC -->
+    <div id="modal-confirm-quit" class="fixed inset-0 z-[70] flex items-center justify-center modal-overlay hidden opacity-0 transition-opacity duration-300 p-4">
+      <div class="bg-white dark:bg-gray-800 w-full max-w-[320px] rounded-3xl p-6 shadow-2xl transition-transform transform scale-95 text-center" id="modal-quit-content">
+        <div class="w-16 h-16 bg-red-100 dark:bg-red-900/50 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Tạm dừng học?</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Tiến trình của phiên học hiện tại sẽ bị hủy bỏ. Bạn có chắc chắn muốn thoát về trang chủ?</p>
+        
+        <div class="flex gap-3">
+          <button onclick="cancelQuitLearning()" class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold py-3 rounded-xl transition-colors">
+            Tiếp tục học
+          </button>
+          <button onclick="executeQuitLearning()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-md transition-colors">
+            Thoát ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 bg-gray-800 dark:bg-gray-700 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl z-[80] transition-all flex items-center gap-2 pointer-events-none">
+      <span id="toast-icon"><i class="fa-solid fa-bell text-brand"></i></span> 
+      <span id="toast-msg">Notification</span>
+    </div>
+
+  </div>
+
+  <script>
+    const INTERVALS = {
+      1: 4 * 60 * 60 * 1000,      
+      2: 24 * 60 * 60 * 1000,     
+      3: 3 * 24 * 60 * 60 * 1000, 
+      4: 7 * 24 * 60 * 60 * 1000, 
+      5: 30 * 24 * 60 * 60 * 1000 
+    };
+
+    /* ===== THAM SỐ CHỈNH NHANH ===== */
+    const FAST_SECONDS = 7;        // trả lời đúng dưới số giây này thì được lên cấp (như cũ)
+    const SLOW_FACTOR = 0.75;      // đúng nhưng chậm: giữ cấp, ôn lại sớm hơn (75% khoảng cách)
+    const TYPO_THRESHOLD = 0.8;    // độ giống >= 80% thì tính là "gần đúng"
+    const TYPO_SCORE = 0.8;        // gần đúng được tính 80% điểm: giữ nguyên cấp, ôn lại sớm hơn
+    const ACCEPT_PINYIN_AT_L5 = true; // Cấp 5 (gõ chữ Hán): gõ đúng pinyin nhưng chưa ra chữ Hán -> tính 80%
+    const FAVORITE_WEIGHT = 3;     // từ yêu thích có tỉ lệ được chọn cao gấp 3 lần trong bài tập AI
+
+    // Khoảng cách Damerau-Levenshtein (OSA): thêm/xóa/sửa/đảo 2 ký tự kề nhau đều tính 1 lỗi
+    // Ví dụ: "recieve" -> "receive" chỉ là 1 lỗi (đảo chữ), không phải 2
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      if (!m) return n; if (!n) return m;
+      const d = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) d[i][0] = i;
+      for (let j = 0; j <= n; j++) d[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+          if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+            d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+          }
+        }
+      }
+      return d[m][n];
+    }
+
+    // Độ giống 0..1 (happy vs hapy = 0.8)
+    function similarity(a, b) {
+      a = a.trim().toLowerCase(); b = b.trim().toLowerCase();
+      const maxLen = Math.max(a.length, b.length);
+      return maxLen ? 1 - levenshtein(a, b) / maxLen : 1;
+    }
+
+    // Chọn n từ ngẫu nhiên không trùng, từ yêu thích có trọng số cao hơn
+    function pickExerciseWords(n = 10) {
+      return db
+        .map(w => ({ w, key: Math.pow(Math.random(), 1 / (w.favorite ? FAVORITE_WEIGHT : 1)) }))
+        .sort((x, y) => y.key - x.key)
+        .slice(0, n)
+        .map(x => x.w);
+    }
+
+    const LEVEL_INFO = {
+      1: { name: 'Mới học', color: 'text-red-500', bg: 'bg-red-500', icon: 'fa-seedling' },
+      2: { name: 'Mang máng', color: 'text-orange-500', bg: 'bg-orange-500', icon: 'fa-leaf' },
+      3: { name: 'Tạm nhớ', color: 'text-yellow-500', bg: 'bg-yellow-500', icon: 'fa-clover' },
+      4: { name: 'Ghi nhớ', color: 'text-green-500', bg: 'bg-green-500', icon: 'fa-tree' },
+      5: { name: 'Khắc sâu', color: 'text-sky-500', bg: 'bg-sky-500', icon: 'fa-mountain-sun' }
+    };
+
+    let db = [];
+    let learningQueue = [];
+    let currentQIndex = 0;
+    let qStartTime = 0;
+    let isAnswering = false;
+    let sessionStats = { total: 0, correct: 0, typo: 0, levelUps: 0, totalTime: 0 };
+    let currentDetailWordId = null;
+    let notificationEnabled = localStorage.getItem('baobao_notify') === 'true';
+    let swRegistration = null; 
+
+    let dailyExerciseWords = [];
+    let dailyExerciseData = null;
+
+    const initialData = [
+      { id: 1, zh: "你好", pinyin: "nǐ hǎo", hv: "nễ hảo", vi: "Xin chào", hsk: 1, exampleZh: "你好，很高兴认识你。", examplePinyin: "nǐ hǎo, hěn gāo xìng rèn shi nǐ.", exampleVi: "Xin chào, rất vui được làm quen với bạn.", level: 1, nextReview: Date.now() - 10000, favorite: true },
+      { id: 2, zh: "谢谢", pinyin: "xiè xie", hv: "tạ tạ", vi: "Cảm ơn", hsk: 1, exampleZh: "谢谢你的帮助。", examplePinyin: "xiè xie nǐ de bāng zhù.", exampleVi: "Cảm ơn sự giúp đỡ của bạn.", level: 1, nextReview: Date.now() - 50000, favorite: false },
+      { id: 3, zh: "朋友", pinyin: "péng you", hv: "bằng hữu", vi: "Bạn bè", hsk: 1, exampleZh: "他是我的好朋友。", examplePinyin: "tā shì wǒ de hǎo péng you.", exampleVi: "Anh ấy là bạn tốt của tôi.", level: 1, nextReview: Date.now() - 1000, favorite: true },
+      { id: 4, zh: "学习", pinyin: "xué xí", hv: "học tập", vi: "Học tập", hsk: 1, exampleZh: "我每天学习汉语。", examplePinyin: "wǒ měi tiān xué xí hàn yǔ.", exampleVi: "Mỗi ngày tôi học tiếng Trung.", level: 2, nextReview: Date.now() - 20000, favorite: false },
+      { id: 5, zh: "喜欢", pinyin: "xǐ huan", hv: "hỷ hoan", vi: "Thích", hsk: 1, exampleZh: "我喜欢喝茶。", examplePinyin: "wǒ xǐ huan hē chá.", exampleVi: "Tôi thích uống trà.", level: 2, nextReview: Date.now() - 60000, favorite: false },
+      { id: 6, zh: "工作", pinyin: "gōng zuò", hv: "công tác", vi: "Làm việc, công việc", hsk: 1, exampleZh: "他每天八点开始工作。", examplePinyin: "tā měi tiān bā diǎn kāi shǐ gōng zuò.", exampleVi: "Mỗi ngày anh ấy bắt đầu làm việc lúc 8 giờ.", level: 2, nextReview: Date.now() - 60000, favorite: false },
+      { id: 7, zh: "健康", pinyin: "jiàn kāng", hv: "kiện khang", vi: "Sức khỏe, khỏe mạnh", hsk: 3, exampleZh: "健康比什么都重要。", examplePinyin: "jiàn kāng bǐ shén me dōu zhòng yào.", exampleVi: "Sức khỏe quan trọng hơn bất cứ thứ gì.", level: 3, nextReview: Date.now() - 120000, favorite: false },
+      { id: 8, zh: "努力", pinyin: "nǔ lì", hv: "nỗ lực", vi: "Nỗ lực, cố gắng", hsk: 3, exampleZh: "只要努力，就会成功。", examplePinyin: "zhǐ yào nǔ lì, jiù huì chéng gōng.", exampleVi: "Chỉ cần nỗ lực thì sẽ thành công.", level: 3, nextReview: Date.now() - 60000, favorite: true },
+      { id: 9, zh: "习惯", pinyin: "xí guàn", hv: "tập quán", vi: "Thói quen", hsk: 3, exampleZh: "早起是一个好习惯。", examplePinyin: "zǎo qǐ shì yí ge hǎo xí guàn.", exampleVi: "Dậy sớm là một thói quen tốt.", level: 4, nextReview: Date.now() - 3600000, favorite: false },
+      { id: 10, zh: "机会", pinyin: "jī huì", hv: "cơ hội", vi: "Cơ hội", hsk: 3, exampleZh: "这是一个难得的机会。", examplePinyin: "zhè shì yí ge nán dé de jī huì.", exampleVi: "Đây là một cơ hội hiếm có.", level: 4, nextReview: Date.now() - 10000, favorite: false },
+      { id: 11, zh: "经验", pinyin: "jīng yàn", hv: "kinh nghiệm", vi: "Kinh nghiệm", hsk: 3, exampleZh: "他有很多工作经验。", examplePinyin: "tā yǒu hěn duō gōng zuò jīng yàn.", exampleVi: "Anh ấy có nhiều kinh nghiệm làm việc.", level: 5, nextReview: Date.now() - 10000, favorite: false },
+      { id: 12, zh: "环境", pinyin: "huán jìng", hv: "hoàn cảnh", vi: "Môi trường", hsk: 3, exampleZh: "我们要保护环境。", examplePinyin: "wǒ men yào bǎo hù huán jìng.", exampleVi: "Chúng ta phải bảo vệ môi trường.", level: 5, nextReview: Date.now() - 10000, favorite: false }
+    ];
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    /* ===== TIẾNG TRUNG: PINYIN, THANH ĐIỆU, HÁN VIỆT ===== */
+    const TONE_MARKS = {
+      'ā':1,'ē':1,'ī':1,'ō':1,'ū':1,'ǖ':1,
+      'á':2,'é':2,'í':2,'ó':2,'ú':2,'ǘ':2,
+      'ǎ':3,'ě':3,'ǐ':3,'ǒ':3,'ǔ':3,'ǚ':3,
+      'à':4,'è':4,'ì':4,'ò':4,'ù':4,'ǜ':4
+    };
+    const CJK_RE = /[\u3400-\u9fff]/;
+    let toneColorEnabled = localStorage.getItem('baobao_tonecolor') !== 'false';
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function hasCJK(str) { return CJK_RE.test(str || ''); }
+    function normZh(str) { return String(str || '').replace(/\s+/g, ''); }
+
+    // Bỏ dấu tiếng Việt để tìm kiếm ("ban be" tìm ra "bạn bè")
+    function foldVi(str) {
+      return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+    }
+
+    // Chuẩn hoá pinyin để so sánh: bỏ dấu thanh, số thanh, khoảng trắng; ü/v -> u
+    function normPinyin(str) {
+      return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zü]/g, '').replace(/[üv]/g, 'u');
+    }
+
+    function toneOf(syl) {
+      const m = String(syl).match(/([1-5])$/);
+      if (m) return parseInt(m[1], 10);
+      for (const ch of String(syl).toLowerCase()) { if (TONE_MARKS[ch]) return TONE_MARKS[ch]; }
+      return 5;
+    }
+    function pinyinSyllables(p) { return String(p || '').trim().split(/\s+/).filter(Boolean); }
+
+    function renderPinyinHtml(p) {
+      const syl = pinyinSyllables(p);
+      if (!syl.length) return '';
+      if (!toneColorEnabled) return escapeHtml(syl.join(' '));
+      return syl.map(x => `<span class="tone${toneOf(x)}">${escapeHtml(x)}</span>`).join(' ');
+    }
+    // Tô màu từng chữ Hán theo thanh điệu khi số âm tiết khớp số chữ
+    function renderZhHtml(zh, pinyin) {
+      const chars = Array.from(zh || '');
+      const syl = pinyinSyllables(pinyin);
+      if (!toneColorEnabled || !syl.length || syl.length !== chars.length || !chars.every(c => CJK_RE.test(c))) return escapeHtml(zh);
+      return chars.map((c, i) => `<span class="tone${toneOf(syl[i])}">${escapeHtml(c)}</span>`).join('');
+    }
+    // Tô đậm từ đang học trong câu ví dụ (tiếng Trung không có khoảng trắng nên không dùng \b)
+    function highlightZh(sentence, word) {
+      const safe = escapeHtml(sentence || '');
+      if (!word) return safe;
+      const w = escapeHtml(word);
+      return safe.split(w).join(`<span class="text-brand font-bold underline underline-offset-4">${w}</span>`);
+    }
+
+    function updateToneColorUI() {
+      const el = document.getElementById('tonecolor-text');
+      if (el) el.innerText = toneColorEnabled ? 'Tắt màu thanh điệu' : 'Bật màu thanh điệu';
+    }
+    function toggleToneColor() {
+      toneColorEnabled = !toneColorEnabled;
+      localStorage.setItem('baobao_tonecolor', toneColorEnabled);
+      updateToneColorUI();
+      renderDictionary();
+      showToast(toneColorEnabled ? 'Đã bật màu theo thanh điệu' : 'Đã tắt màu theo thanh điệu');
+    }
+
+    /* ===== NÉT VIẾT (HanziWriter, tải khi cần, cần có mạng) ===== */
+    let hanziWriterPromise = null;
+    let strokeWriters = [];
+    let strokeRunId = 0;
+
+    function loadHanziWriter() {
+      if (window.HanziWriter) return Promise.resolve();
+      if (!hanziWriterPromise) {
+        hanziWriterPromise = new Promise((resolve, reject) => {
+          const sc = document.createElement('script');
+          sc.src = 'https://cdn.jsdelivr.net/npm/hanzi-writer@3/dist/hanzi-writer.min.js';
+          sc.onload = resolve;
+          sc.onerror = () => { hanziWriterPromise = null; reject(new Error('load')); };
+          document.head.appendChild(sc);
+        });
+      }
+      return hanziWriterPromise;
+    }
+
+    async function toggleStrokeOrder() {
+      const area = document.getElementById('stroke-area');
+      if (!area.classList.contains('hidden')) { area.classList.add('hidden'); strokeRunId++; return; }
+      const w = db.find(x => x.id === currentDetailWordId);
+      if (!w) return;
+      const chars = Array.from(w.zh).filter(c => CJK_RE.test(c)).slice(0, 6);
+      if (!chars.length) { showToast('Từ này không có chữ Hán để xem nét viết', true); return; }
+      const btn = document.getElementById('btn-detail-stroke');
+      btn.disabled = true;
+      try { await loadHanziWriter(); }
+      catch (e) { showToast('Không tải được dữ liệu nét viết (cần có mạng)', true); btn.disabled = false; return; }
+      btn.disabled = false;
+
+      const box = document.getElementById('stroke-chars');
+      box.innerHTML = '';
+      const dark = document.documentElement.classList.contains('dark');
+      strokeWriters = chars.map(ch => {
+        const holder = document.createElement('div');
+        holder.className = 'rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900';
+        box.appendChild(holder);
+        return HanziWriter.create(holder, ch, {
+          width: 96, height: 96, padding: 6,
+          strokeColor: dark ? '#f8fafc' : '#1f2937',
+          outlineColor: dark ? '#475569' : '#d1d5db',
+          radicalColor: '#10b981',
+          strokeAnimationSpeed: 1.2, delayBetweenStrokes: 250,
+          onLoadCharDataError: () => { holder.innerHTML = '<div class="w-24 h-24 flex items-center justify-center text-[10px] text-gray-400 text-center p-2">Chưa có dữ liệu nét</div>'; }
+        });
+      });
+      area.classList.remove('hidden');
+      replayStrokeOrder();
+    }
+
+    // Viết lần lượt từng chữ
+    function replayStrokeOrder() {
+      const run = ++strokeRunId;
+      strokeWriters.forEach(wr => { try { wr.hideCharacter(); } catch (e) {} });
+      const step = (i) => {
+        if (run !== strokeRunId || i >= strokeWriters.length) return;
+        strokeWriters[i].animateCharacter({ onComplete: () => step(i + 1) });
+      };
+      step(0);
+    }
+
+    function cleanJsonString(str) {
+      return str.replace(/```json/gi, '').replace(/```/g, '').trim();
+    }
+
+    /* XỬ LÝ MENU SETTINGS DROPDOWN */
+    function toggleSettingsMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('settings-dropdown');
+      menu.classList.toggle('hidden');
+    }
+
+    function closeSettingsMenu() {
+      const menu = document.getElementById('settings-dropdown');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('settings-dropdown');
+      const btn = document.getElementById('btn-settings-toggle');
+      if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        closeSettingsMenu();
+      }
+    });
+
+    /* QUẢN LÝ XUẤT / NHẬP JSON */
+    function openJsonModal() {
+      const modal = document.getElementById('modal-json');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        document.getElementById('modal-json-content').classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeJsonModal() {
+      const modal = document.getElementById('modal-json');
+      modal.classList.add('opacity-0');
+      document.getElementById('modal-json-content').classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    // iPhone/iPad: trình duyệt bỏ qua thuộc tính download -> dùng bảng chia sẻ để "Lưu vào Tệp"
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    async function exportJSON() {
+      const fileName = `BaobaoLife_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      const json = JSON.stringify(db, null, 2);
+
+      if (isIOS()) {
+        try {
+          const file = new File([json], fileName, { type: 'application/json' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: 'Sao lưu Baobao Life' });
+            showToast('Đã gửi file sao lưu. Nếu bạn chọn "Lưu vào Tệp" thì file nằm trong ứng dụng Tệp.');
+            closeJsonModal();
+            return;
+          }
+        } catch (err) {
+          if (err && err.name === 'AbortError') { showToast('Bạn đã đóng bảng chia sẻ, file chưa được lưu.', true); return; }
+          // lỗi khác: thử cách dự phòng bên dưới
+        }
+        // Dự phòng cho iOS cũ: sao chép nội dung sao lưu để dán vào Ghi chú
+        try {
+          await navigator.clipboard.writeText(json);
+          showToast('Máy chưa hỗ trợ lưu file. Đã sao chép nội dung sao lưu, hãy dán vào Ghi chú để giữ lại.', true);
+        } catch (err) {
+          showToast('Không thể xuất file trên thiết bị này. Hãy thử mở app bằng Safari.', true);
+        }
+        return;
+      }
+
+      // Android / máy tính: giữ nguyên cách tải trực tiếp như cũ
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(json);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", fileName);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Đã xuất file JSON thành công!');
+      closeJsonModal();
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(String(e.target.result).replace(/^\uFEFF/, ''));
+          if (Array.isArray(importedData) && importedData.every(w => w && w.zh && w.vi)) {
+            db = importedData;
+            saveData();
+            initDashboard();
+            showToast('Đã nhập thành công từ file JSON!');
+            closeJsonModal();
+          } else {
+            showToast('Tệp JSON không hợp lệ!', true);
+          }
+        } catch (err) {
+          showToast('Lỗi đọc tệp JSON!', true);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function loadData() {
+      const stored = localStorage.getItem('baobao_db');
+      if (stored) {
+        try { 
+          db = JSON.parse(stored);
+          db.forEach(w => { if (typeof w.favorite === 'undefined') w.favorite = false; });
+        } catch(e) { db = [...initialData]; }
+      } else {
+        db = [...initialData]; saveData();
+      }
+      applyForgettingCurve();
+    }
+    
+    function saveData() { localStorage.setItem('baobao_db', JSON.stringify(db)); }
+    
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark'); localStorage.setItem('baobao_theme', 'light');
+      } else {
+        html.classList.add('dark'); localStorage.setItem('baobao_theme', 'dark');
+      }
+      renderDictionary();
+    }
+    
+    function applySavedTheme() {
+      const theme = localStorage.getItem('baobao_theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+    
+    function applyForgettingCurve() {
+      const now = Date.now();
+      let downgraded = 0;
+      db.forEach(word => {
+        if (word.level > 1 && word.nextReview < now) {
+          const overdue = now - word.nextReview;
+          const interval = INTERVALS[word.level];
+          if (overdue > interval) { 
+            word.level--; 
+            word.nextReview = now - 1000; 
+            downgraded++;
+          }
+        }
+      });
+      if (downgraded > 0) saveData();
+    }
+
+    async function initServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try { swRegistration = await navigator.serviceWorker.register('./sw.js'); } catch (e) {}
+      }
+    }
+    function initNotificationSystem() {
+      updateNotificationUI();
+      setInterval(checkAndNotify, 60000); setTimeout(checkAndNotify, 3000);
+    }
+    async function toggleNotifications() {
+      if (!('Notification' in window)) { showToast('Trình duyệt không hỗ trợ thông báo!', true); return; }
+      if (Notification.permission === 'granted') {
+        notificationEnabled = !notificationEnabled; localStorage.setItem('baobao_notify', notificationEnabled);
+        updateNotificationUI();
+        if (notificationEnabled) { showToast('Đã bật thông báo!'); checkAndNotify(); } else { showToast('Đã tắt thông báo!'); }
+      } else if (Notification.permission !== 'denied') {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          notificationEnabled = true; localStorage.setItem('baobao_notify', true); updateNotificationUI(); showToast('Đã bật thông báo!'); checkAndNotify();
+        } else { showToast('Từ chối quyền thông báo', true); }
+      }
+    }
+    function updateNotificationUI() {
+      const notifyText = document.getElementById('notify-text');
+      if (notifyText) {
+        notifyText.innerText = (notificationEnabled && Notification.permission === 'granted') ? 'Tắt nhắc nhở' : 'Bật nhắc nhở';
+      }
+    }
+    async function sendMobileNotification(title, options = {}) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const def = { icon: './icon-192.png', badge: './icon-192.png', tag: 'baobao-reminder', vibrate: [200, 100, 200] };
+      if (swRegistration && swRegistration.showNotification) { swRegistration.showNotification(title, {...def, ...options}); } 
+      else { new Notification(title, {...def, ...options}); }
+    }
+    function checkAndNotify() {
+      if (!notificationEnabled || Notification.permission !== 'granted') return;
+      const now = Date.now(); const due = db.filter(w => w.nextReview <= now);
+      if (due.length > 0) {
+        const last = parseInt(localStorage.getItem('baobao_last_notify') || '0');
+        if (now - last > 4 * 60 * 60 * 1000) {
+          sendMobileNotification("Baobao Life AI ⚡", { body: `Bạn có ${due.length} từ vựng đã đến Thời Điểm Vàng!` });
+          localStorage.setItem('baobao_last_notify', now.toString());
+        }
+      }
+    }
+
+    function playAudio(text) {
+      if (!text) return;
+      const clean = String(text).replace(/\[\[|\]\]/g, '');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.lang = 'zh-CN'; utterance.rate = 0.85;
+        const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+        const zhVoice = voices.find(v => /^zh[-_]CN/i.test(v.lang)) || voices.find(v => /^zh/i.test(v.lang));
+        if (zhVoice) utterance.voice = zhVoice;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    /* ===== CÀI ĐẶT ỨNG DỤNG (PWA) + TỰ KIỂM TRA ===== */
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; });
+    window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; showToast('Đã cài đặt ứng dụng!'); });
+
+    function isStandalone() {
+      return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    }
+
+    function openInstallModal() {
+      const modal = document.getElementById('modal-install');
+      modal.classList.remove('hidden');
+      setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modal-install-content').classList.remove('scale-95'); }, 10);
+      runInstallCheck();
+    }
+    function closeInstallModal() {
+      const modal = document.getElementById('modal-install');
+      modal.classList.add('opacity-0'); document.getElementById('modal-install-content').classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function installApp() {
+      if (!deferredInstallPrompt) { showToast('Trình duyệt chưa cho cài lúc này, xem hướng dẫn bên dưới', true); return; }
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch (e) {}
+      deferredInstallPrompt = null;
+      runInstallCheck();
+    }
+
+    async function runInstallCheck() {
+      const list = document.getElementById('install-checks');
+      const statusEl = document.getElementById('install-status');
+      const helpEl = document.getElementById('install-help');
+      const btn = document.getElementById('btn-install-now');
+      list.innerHTML = ''; helpEl.innerHTML = ''; btn.classList.add('hidden');
+      statusEl.innerText = 'Đang kiểm tra...';
+
+      const problems = [];
+      const row = (ok, text, fix) => {
+        list.innerHTML += `<li class="flex gap-2"><span>${ok ? '✅' : '❌'}</span><span>${escapeHtml(text)}${(!ok && fix) ? `<br><span class="text-red-500 dark:text-red-400">${escapeHtml(fix)}</span>` : ''}</span></li>`;
+        if (!ok) problems.push(text);
+      };
+
+      row(window.isSecureContext, 'Đang mở bằng địa chỉ https', 'Hãy mở app bằng đường link https:// (GitHub Pages có sẵn).');
+
+      // manifest.json + icon
+      try {
+        const link = document.querySelector('link[rel="manifest"]');
+        if (!link) throw new Error('nolink');
+        // thêm tham số ngẫu nhiên để hỏi thẳng máy chủ, không bị service worker trả bản cũ trong cache
+        const bust = (u) => u + (u.includes('?') ? '&' : '?') + '_=' + Date.now();
+        const res = await fetch(bust(link.href), { cache: 'no-store' });
+        if (!res.ok) throw new Error('http');
+        const m = await res.json();
+        row(true, 'File manifest.json đọc được');
+        for (const ic of (m.icons || [])) {
+          const url = new URL(ic.src, link.href).href;
+          const name = url.split('/').pop();
+          let ok = false;
+          try {
+            const r = await fetch(bust(url), { cache: 'no-store' });
+            ok = r.ok && (!r.headers.get('content-type') || r.headers.get('content-type').startsWith('image/'));
+          } catch (e) {}
+          row(ok, `Icon ${name} tải được`, `Không tìm thấy ${name}. Hãy tải file này lên cùng thư mục với index.html.`);
+        }
+      } catch (e) {
+        row(false, 'File manifest.json đọc được', 'Không đọc được manifest.json. Hãy tải file này lên cùng thư mục với index.html.');
+      }
+
+      // service worker
+      let swOk = false;
+      try {
+        if ('serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.getRegistration();
+          swOk = !!(reg && (reg.active || reg.waiting || reg.installing));
+        }
+      } catch (e) {}
+      row(swOk, 'Service worker (sw.js) đang chạy', 'Chưa chạy. Kiểm tra đã tải sw.js lên đúng thư mục chưa, rồi tải lại trang một lần.');
+
+      const standalone = isStandalone();
+      const canPrompt = !!deferredInstallPrompt;
+      list.innerHTML += `<li class="flex gap-2"><span>ℹ️</span><span>Đang mở dưới dạng ứng dụng đã cài: <b>${standalone ? 'Có' : 'Chưa'}</b></span></li>`;
+      list.innerHTML += `<li class="flex gap-2"><span>ℹ️</span><span>Trình duyệt sẵn sàng cho cài đặt: <b>${canPrompt ? 'Có' : 'Không'}</b></span></li>`;
+
+      if (standalone) {
+        statusEl.innerText = 'Bạn đang dùng bản đã cài đặt ✅';
+      } else if (canPrompt) {
+        statusEl.innerText = 'Sẵn sàng cài đặt! Bấm nút bên dưới.';
+        btn.classList.remove('hidden');
+      } else if (problems.length) {
+        statusEl.innerText = 'Chưa cài được vì còn thiếu file (xem dấu ❌).';
+        helpEl.innerHTML = 'Sau khi tải đủ <b>5 file</b> lên (index.html, manifest.json, sw.js, icon-192.png, icon-512.png), hãy <b>đóng hẳn rồi mở lại</b> trang và bấm "Kiểm tra lại".';
+      } else if (isIOS()) {
+        statusEl.innerText = 'iPhone/iPad cài theo cách thủ công.';
+        helpEl.innerHTML = 'Mở link bằng <b>Safari</b> → bấm nút <b>Chia sẻ</b> (hình vuông có mũi tên) → chọn <b>Thêm vào Màn hình chính</b>.';
+      } else {
+        statusEl.innerText = 'File đều ổn nhưng trình duyệt không đưa ra nút cài.';
+        helpEl.innerHTML = '<b>Rất có thể app đã được cài sẵn</b> nên không thấy nút cài (dù chưa có biểu tượng ngoài màn hình chính). Hãy thử:<br>1) Vuốt mở <b>ngăn ứng dụng</b> và tìm "Baobao Life". Nếu thấy, nhấn giữ biểu tượng rồi chọn thêm ra màn hình chính.<br>2) Vào <b>Cài đặt điện thoại → Ứng dụng</b>, tìm "Baobao Life", gỡ cài đặt rồi mở lại link để cài lại.<br>3) Hoặc mở menu <b>⋮</b> của Chrome và chọn <b>Cài đặt ứng dụng</b> / <b>Thêm vào Màn hình chính</b>.';
+      }
+    }
+
+    function openAISettingsModal() {
+      const modal = document.getElementById('modal-ai-settings');
+      document.getElementById('input-api-key').value = localStorage.getItem('baobao_gemini_key') || '';
+      modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modal-ai-content').classList.remove('scale-95'); }, 10);
+    }
+    function closeAISettingsModal() {
+      const modal = document.getElementById('modal-ai-settings');
+      modal.classList.add('opacity-0'); document.getElementById('modal-ai-content').classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+    function saveApiKey() {
+      const key = document.getElementById('input-api-key').value.trim();
+      if (!key) { showToast('Vui lòng nhập API Key', true); return; }
+      localStorage.setItem('baobao_gemini_key', key); closeAISettingsModal(); showToast('Đã lưu API Key!');
+    }
+    function removeApiKey() { localStorage.removeItem('baobao_gemini_key'); document.getElementById('input-api-key').value = ''; closeAISettingsModal(); showToast('Đã xóa Key'); }
+
+    async function autoFillWithAI() {
+      const input = document.getElementById('new-zh').value.trim();
+      if (!input) { showToast('Hãy nhập chữ Hán (hoặc pinyin / nghĩa tiếng Việt) trước!', true); return; }
+      const apiKey = localStorage.getItem('baobao_gemini_key');
+      if (!apiKey) { openAISettingsModal(); return; }
+
+      const btn = document.getElementById('btn-ai-fill'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tạo...';
+      const prompt = `Bạn là trợ lý tiếng Trung cho người Việt. Đầu vào: "${input}" (có thể là chữ Hán, pinyin hoặc nghĩa tiếng Việt).
+Trả về duy nhất JSON, dùng chữ Hán GIẢN THỂ:
+{"zh":"từ bằng chữ Hán giản thể","pinyin":"pinyin có dấu thanh, TÁCH từng âm tiết bằng dấu cách, ví dụ: péng you","hv":"âm Hán Việt, ví dụ: bằng hữu (để chuỗi rỗng nếu không có)","vi":"nghĩa tiếng Việt ngắn gọn","hsk":số cấp HSK từ 1 đến 6 (0 nếu không thuộc HSK),"exampleZh":"một câu ví dụ ngắn, tự nhiên, có chứa nguyên từ này","examplePinyin":"pinyin có dấu của câu ví dụ, tách từng âm tiết bằng dấu cách","exampleVi":"dịch câu ví dụ sang tiếng Việt"}`;
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${apiKey}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
+        });
+        const result = await res.json(); 
+        const data = JSON.parse(cleanJsonString(result.candidates[0].content.parts[0].text));
+        if (!hasCJK(input) && data.zh) document.getElementById('new-zh').value = data.zh;
+        document.getElementById('new-pinyin').value = data.pinyin || '';
+        document.getElementById('new-hv').value = data.hv || '';
+        document.getElementById('new-vi').value = data.vi || '';
+        const hsk = parseInt(data.hsk, 10);
+        document.getElementById('new-hsk').value = (hsk >= 1 && hsk <= 6) ? String(hsk) : '';
+        document.getElementById('new-example-zh').value = data.exampleZh || '';
+        document.getElementById('new-example-pinyin').value = data.examplePinyin || '';
+        document.getElementById('new-example-vi').value = data.exampleVi || '';
+        showToast('Đã điền tự động!');
+      } catch (err) { showToast('Lỗi AI!', true); } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI Tự Điền'; }
+    }
+
+    function fillAddForm(w) {
+      document.getElementById('new-zh').value = w ? w.zh : '';
+      document.getElementById('new-pinyin').value = (w && w.pinyin) || '';
+      document.getElementById('new-hv').value = (w && w.hv) || '';
+      document.getElementById('new-vi').value = w ? w.vi : '';
+      document.getElementById('new-hsk').value = (w && w.hsk) ? String(w.hsk) : '';
+      document.getElementById('new-example-zh').value = (w && w.exampleZh) || '';
+      document.getElementById('new-example-pinyin').value = (w && w.examplePinyin) || '';
+      document.getElementById('new-example-vi').value = (w && w.exampleVi) || '';
+    }
+
+    function showAddModal() {
+      const modal = document.getElementById('modal-add-word'); 
+      modal.classList.remove('hidden'); 
+      setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modal-add-content').classList.remove('translate-y-full'); }, 10); 
+    }
+
+    function openAddModal() { 
+      document.getElementById('modal-add-title').innerText = "Thêm từ mới"; 
+      document.getElementById('edit-word-id').value = ""; 
+      fillAddForm(null);
+      showAddModal();
+    }
+
+    function closeAddModal() { 
+      const modal = document.getElementById('modal-add-word'); 
+      modal.classList.add('opacity-0'); 
+      document.getElementById('modal-add-content').classList.add('translate-y-full'); 
+      setTimeout(() => modal.classList.add('hidden'), 300); 
+    }
+
+    function saveNewWord() {
+      const zh = normZh(document.getElementById('new-zh').value);
+      const vi = document.getElementById('new-vi').value.trim();
+      const editId = document.getElementById('edit-word-id').value;
+      if (!zh || !vi) return showToast('Điền đủ chữ Hán và nghĩa tiếng Việt', true);
+
+      const fields = {
+        zh,
+        pinyin: document.getElementById('new-pinyin').value.trim(),
+        hv: document.getElementById('new-hv').value.trim(),
+        vi,
+        hsk: parseInt(document.getElementById('new-hsk').value, 10) || 0,
+        exampleZh: document.getElementById('new-example-zh').value.trim(),
+        examplePinyin: document.getElementById('new-example-pinyin').value.trim(),
+        exampleVi: document.getElementById('new-example-vi').value.trim()
+      };
+
+      if (editId) {
+        const idx = db.findIndex(w => w.id == editId);
+        if (idx !== -1) { 
+          Object.assign(db[idx], fields);
+          showToast('Đã cập nhật!'); 
+        }
+      } else {
+        db.unshift({ 
+          id: Date.now(), 
+          ...fields,
+          level: 1, 
+          nextReview: Date.now() - 1000,
+          favorite: false 
+        }); 
+        showToast('Đã thêm từ!');
+      }
+      saveData(); closeAddModal(); initDashboard();
+    }
+    
+    function deleteWord(id) { 
+      db = db.filter(w => w.id !== id); 
+      saveData(); 
+      closeWordDetailModal(); 
+      initDashboard(); 
+      showToast('Đã xóa!'); 
+    }
+    
+    function toggleFavorite(id, e) {
+      if(e) e.stopPropagation();
+      const w = db.find(x => x.id === id);
+      if(w) {
+        w.favorite = !w.favorite;
+        saveData();
+        renderDictionary();
+        
+        if (currentDetailWordId === id) {
+          const btnFav = document.getElementById('btn-detail-favorite');
+          if (w.favorite) {
+            btnFav.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            btnFav.className = "w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 text-red-500 hover:bg-red-200 dark:hover:bg-red-900 flex items-center justify-center transition-colors";
+          } else {
+            btnFav.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            btnFav.className = "w-8 h-8 rounded-full bg-red-50 dark:bg-gray-700 text-red-400 hover:text-red-500 flex items-center justify-center transition-colors";
+          }
+        }
+      }
+    }
+
+    function openWordDetailModal(id) {
+      const w = db.find(x => x.id === id); 
+      if(!w) return;
+      currentDetailWordId = id;
+      strokeRunId++; strokeWriters = [];
+      document.getElementById('stroke-area').classList.add('hidden');
+      
+      document.getElementById('detail-word-zh').innerHTML = renderZhHtml(w.zh, w.pinyin); 
+      document.getElementById('detail-word-vi').innerText = w.vi;
+      
+      const levelInfo = LEVEL_INFO[w.level] || LEVEL_INFO[1];
+      const badge = document.getElementById('detail-level-badge');
+      badge.innerText = `Cấp ${w.level}`;
+      badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-opacity-20 ${levelInfo.bg} ${levelInfo.color}`;
+
+      const btnFav = document.getElementById('btn-detail-favorite');
+      btnFav.onclick = (e) => toggleFavorite(id, e);
+      if (w.favorite) {
+        btnFav.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        btnFav.className = "w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 text-red-500 hover:bg-red-200 dark:hover:bg-red-900 flex items-center justify-center transition-colors";
+      } else {
+        btnFav.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        btnFav.className = "w-8 h-8 rounded-full bg-red-50 dark:bg-gray-700 text-red-400 hover:text-red-500 flex items-center justify-center transition-colors";
+      }
+
+      const pEl = document.getElementById('detail-word-pinyin');
+      if (w.pinyin) { pEl.innerHTML = renderPinyinHtml(w.pinyin); pEl.classList.remove('hidden'); } else { pEl.classList.add('hidden'); }
+
+      const hvEl = document.getElementById('detail-word-hv');
+      if (w.hv) { hvEl.innerText = `Hán Việt: ${w.hv}`; hvEl.classList.remove('hidden'); } else { hvEl.classList.add('hidden'); }
+
+      const hskEl = document.getElementById('detail-hsk');
+      if (w.hsk) { hskEl.innerText = `HSK ${w.hsk}`; hskEl.classList.remove('hidden'); } else { hskEl.classList.add('hidden'); }
+      
+      if (w.exampleZh) {
+        document.getElementById('detail-example-section').classList.remove('hidden');
+        document.getElementById('detail-example-zh').innerHTML = highlightZh(w.exampleZh, w.zh);
+        const exP = document.getElementById('detail-example-pinyin');
+        if (w.examplePinyin) { exP.innerHTML = renderPinyinHtml(w.examplePinyin); exP.classList.remove('hidden'); } else { exP.classList.add('hidden'); }
+        document.getElementById('detail-example-vi').innerText = w.exampleVi ? `Dịch: ${w.exampleVi}` : '';
+        document.getElementById('btn-detail-example-speech').onclick = () => playAudio(w.exampleZh);
+      } else { 
+        document.getElementById('detail-example-section').classList.add('hidden'); 
+      }
+      
+      document.getElementById('btn-detail-speech').onclick = () => playAudio(w.zh);
+      document.getElementById('btn-detail-edit').onclick = () => { 
+        closeWordDetailModal(); 
+        document.getElementById('modal-add-title').innerText = "Chỉnh sửa từ"; 
+        document.getElementById('edit-word-id').value = id; 
+        fillAddForm(w);
+        showAddModal();
+      };
+      
+      document.getElementById('btn-detail-delete').onclick = () => deleteWord(id);
+      
+      const m = document.getElementById('modal-word-detail'); 
+      m.classList.remove('hidden'); 
+      setTimeout(()=> { m.classList.remove('opacity-0'); document.getElementById('modal-detail-content').classList.remove('scale-95'); }, 10);
+    }
+    
+    function closeWordDetailModal() { 
+      currentDetailWordId = null;
+      strokeRunId++;
+      const m = document.getElementById('modal-word-detail'); 
+      m.classList.add('opacity-0'); 
+      document.getElementById('modal-detail-content').classList.add('scale-95'); 
+      setTimeout(()=> m.classList.add('hidden'), 300); 
+    }
+
+    function renderDictionary() {
+      const sRaw = document.getElementById('search-input').value.trim(); 
+      const foldQ = foldVi(sRaw);
+      const pinQ = normPinyin(sRaw);
+      const f = document.getElementById('filter-level').value;
+      const h = document.getElementById('filter-hsk').value;
+      const list = document.getElementById('dictionary-list'); 
+      list.innerHTML = '';
+      
+      const fil = db.filter(w => {
+        const matchSearch = !sRaw
+          || (w.zh && w.zh.includes(sRaw))
+          || (w.vi && foldVi(w.vi).includes(foldQ))
+          || (w.hv && foldVi(w.hv).includes(foldQ))
+          || (pinQ && w.pinyin && normPinyin(w.pinyin).includes(pinQ));
+        let matchFilter = true;
+        if (f === 'favorite') {
+          matchFilter = w.favorite === true;
+        } else if (f !== 'all') {
+          matchFilter = w.level == f;
+        }
+        const matchHsk = (h === 'all') || ((w.hsk || 0) == h);
+        return matchSearch && matchFilter && matchHsk;
+      });
+      
+      if(!fil.length) {
+        list.innerHTML = `<li class="text-center py-8 text-gray-400 dark:text-gray-400 text-sm">Không tìm thấy từ vựng nào</li>`;
+        return;
+      }
+      
+      fil.forEach(w => {
+        const i = LEVEL_INFO[w.level] || LEVEL_INFO[1];
+        const favIconClass = w.favorite ? 'fa-solid text-red-500' : 'fa-regular text-gray-400 dark:text-gray-500 hover:text-red-500';
+        const escapedZhForAudio = (w.zh || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+        list.innerHTML += `
+          <li onclick="openWordDetailModal(${w.id})" class="dict-item p-3.5 rounded-xl flex justify-between items-center cursor-pointer group shadow-sm">
+            <div class="flex-1 pr-2 min-w-0">
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="dict-word-en font-bold text-xl">${renderZhHtml(w.zh, w.pinyin)}</span>
+                ${w.pinyin ? `<span class="dict-ipa text-xs font-semibold">${renderPinyinHtml(w.pinyin)}</span>` : ''}
+              </div>
+              <p class="dict-word-vi text-xs font-medium line-clamp-1 mt-0.5">${w.hv ? `<span class="uppercase font-bold text-[10px] tracking-wide mr-1.5 opacity-70">${escapeHtml(w.hv)}</span>` : ''}${escapeHtml(w.vi || '')}</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              ${w.hsk ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-300">HSK${w.hsk}</span>` : ''}
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${i.bg} bg-opacity-20 ${i.color}">Cấp ${w.level}</span>
+              
+              <button onclick="toggleFavorite(${w.id}, event)" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                <i class="${favIconClass} fa-heart text-sm"></i>
+              </button>
+              
+              <button onclick="event.stopPropagation(); playAudio('${escapedZhForAudio}')" class="w-8 h-8 rounded-full text-gray-400 hover:text-brand flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-volume-high text-sm"></i>
+              </button>
+            </div>
+          </li>`;
+      });
+    }
+
+    function initDashboard() {
+      const now = Date.now(); 
+      const due = db.filter(w => w.nextReview <= now);
+      
+      document.getElementById('due-count').innerText = due.length; 
+      document.getElementById('total-words').innerText = db.length;
+      
+      const b = document.getElementById('btn-start-learning');
+      if(!due.length) { 
+        b.disabled=true; 
+        b.innerHTML='ĐÃ ÔN XONG HÔM NAY <i class="fa-solid fa-check"></i>'; 
+      } else { 
+        b.disabled=false; 
+        b.innerHTML='BẮT ĐẦU HỌC <i class="fa-solid fa-play text-sm"></i>'; 
+      }
+      renderLevelStats(); 
+      renderDictionary();
+    }
+
+    function renderLevelStats() {
+      const c = {1:0, 2:0, 3:0, 4:0, 5:0}; db.forEach(w => c[w.level]++);
+      document.getElementById('level-stats').innerHTML = [5,4,3,2,1].map(i => `<div class="flex items-center gap-3"><div class="w-8 flex justify-center ${LEVEL_INFO[i].color}"><i class="fa-solid ${LEVEL_INFO[i].icon}"></i></div><div class="flex-1"><div class="flex justify-between text-xs mb-1"><span class="font-bold text-gray-700 dark:text-gray-200">Cấp ${i}: ${LEVEL_INFO[i].name}</span><span class="text-gray-500 dark:text-gray-400 font-mono font-semibold">${c[i]} từ</span></div><div class="h-2.5 w-full bg-gray-100 dark:bg-gray-700/80 rounded-full overflow-hidden"><div class="h-full ${LEVEL_INFO[i].bg} rounded-full transition-all duration-500" style="width: ${db.length?Math.round((c[i]/db.length)*100):0}%"></div></div></div></div>`).join('');
+    }
+
+    function startLearning() { 
+      const now = Date.now();
+      let due = db.filter(w => w.nextReview <= now);
+
+      due.sort((a, b) => {
+          if (a.level !== b.level) return a.level - b.level;
+          return a.nextReview - b.nextReview;
+      });
+
+      learningQueue = due.slice(0, 15); 
+      if(learningQueue.length === 0) return;
+
+      hideFeedbackSheet();
+      currentQIndex = 0; 
+      sessionStats = { total: learningQueue.length, correct: 0, typo: 0, levelUps: 0, totalTime: 0 }; 
+      
+      document.getElementById('view-dashboard').classList.add('hidden'); 
+      const viewLearning = document.getElementById('view-learning');
+      viewLearning.classList.remove('hidden'); 
+      viewLearning.classList.add('flex'); 
+      loadQuestion(); 
+    }
+
+    function quitLearning() {
+      const modal = document.getElementById('modal-confirm-quit');
+      modal.classList.remove('hidden');
+      setTimeout(() => { 
+        modal.classList.remove('opacity-0'); 
+        document.getElementById('modal-quit-content').classList.remove('scale-95'); 
+      }, 10);
+    }
+    
+    function cancelQuitLearning() {
+      const modal = document.getElementById('modal-confirm-quit');
+      modal.classList.add('opacity-0'); 
+      document.getElementById('modal-quit-content').classList.add('scale-95'); 
+      setTimeout(()=> modal.classList.add('hidden'), 300);
+    }
+
+    function executeQuitLearning() {
+      cancelQuitLearning();
+      hideFeedbackSheet();
+      document.getElementById('view-learning').classList.add('hidden'); 
+      document.getElementById('view-learning').classList.remove('flex'); 
+      document.getElementById('view-dashboard').classList.remove('hidden'); 
+      initDashboard(); 
+    }
+
+    function backToDashboard() { 
+      document.getElementById('view-summary').classList.add('hidden'); 
+      document.getElementById('view-summary').classList.remove('flex'); 
+      document.getElementById('view-dashboard').classList.remove('hidden'); 
+      initDashboard(); 
+    }
+
+    /* Cấp 1: Hán tự -> chọn nghĩa | Cấp 2: nghĩa -> chọn Hán tự | Cấp 3: nghe -> chọn nghĩa
+       Cấp 4: nghĩa -> gõ pinyin (không cần dấu) | Cấp 5: nghĩa -> gõ chữ Hán */
+    function loadQuestion() { 
+      isAnswering = false; 
+      const w = learningQueue[currentQIndex]; 
+      document.getElementById('learning-progress').style.width = `${(currentQIndex / sessionStats.total) * 100}%`; 
+      document.getElementById('learning-counter').innerText = `${currentQIndex + 1}/${sessionStats.total}`; 
+      document.getElementById('feedback-icon').className = "absolute top-2 text-6xl opacity-0 z-10"; 
+      
+      const cWord = document.getElementById('card-word'); 
+      const cPinyin = document.getElementById('card-pinyin');
+      const cHv = document.getElementById('card-hv');
+      const hint = document.getElementById('question-hint'); 
+      const ans = document.getElementById('answer-area'); 
+      const cardLevel = document.getElementById('card-level');
+      const exampleBox = document.getElementById('card-example-box');
+      
+      ans.innerHTML = ''; 
+      document.getElementById('btn-play-audio').classList.add('hidden'); 
+      exampleBox.classList.add('hidden');
+      cPinyin.classList.add('hidden');
+      cHv.classList.add('hidden');
+      
+      const levelInfo = LEVEL_INFO[w.level] || LEVEL_INFO[1];
+      cardLevel.innerText = `Cấp ${w.level} • ${levelInfo.name}`;
+      cardLevel.className = `inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 uppercase tracking-wider bg-opacity-20 ${levelInfo.bg} ${levelInfo.color}`;
+
+      const BIG = "text-5xl font-extrabold text-gray-800 dark:text-white mb-1";
+      const TXT = "text-3xl font-extrabold text-gray-800 dark:text-white mb-1";
+
+      if (w.level === 1) {
+        cWord.className = BIG;
+        cWord.innerHTML = renderZhHtml(w.zh, w.pinyin); 
+        if (w.pinyin) { cPinyin.innerHTML = renderPinyinHtml(w.pinyin); cPinyin.classList.remove('hidden'); }
+        if (w.hv) { cHv.innerText = `Hán Việt: ${w.hv}`; cHv.classList.remove('hidden'); }
+        hint.innerText = "Chọn nghĩa tiếng Việt đúng"; 
+        
+        if (w.exampleZh) {
+          exampleBox.classList.remove('hidden');
+          document.getElementById('card-example-zh').innerHTML = highlightZh(w.exampleZh, w.zh);
+          document.getElementById('card-example-pinyin').innerHTML = renderPinyinHtml(w.examplePinyin);
+          document.getElementById('card-example-vi').innerText = w.exampleVi ? `Dịch: ${w.exampleVi}` : '';
+        }
+        
+        generateMultipleChoice(w, 'vi'); 
+        playAudio(w.zh);
+      } else if (w.level === 2) {
+        cWord.className = TXT;
+        cWord.innerText = w.vi; 
+        hint.innerText = "Chọn chữ Hán tương ứng"; 
+        generateMultipleChoice(w, 'zh');
+      } else if (w.level === 3) {
+        cWord.className = TXT;
+        cWord.innerText = "🎧 Luyện Nghe & Chọn"; 
+        hint.innerText = "Nghe âm thanh và chọn nghĩa đúng"; 
+        document.getElementById('btn-play-audio').classList.remove('hidden'); 
+        document.getElementById('btn-play-audio').onclick = () => playAudio(w.zh); 
+        generateMultipleChoice(w, 'vi'); 
+        setTimeout(() => playAudio(w.zh), 300);
+      } else {
+        cWord.className = TXT;
+        cWord.innerText = w.vi; 
+        const usePinyin = (w.level === 4) && !!w.pinyin;   // chưa có pinyin thì chuyển sang gõ chữ Hán
+        hint.innerText = usePinyin ? "Gõ pinyin (không cần dấu thanh)" : "Gõ chữ Hán";
+        generateTypingInput(w, usePinyin ? 'pinyin' : 'zh');
+      } 
+      qStartTime = Date.now(); 
+    }
+
+    function generateMultipleChoice(cw, lang) { 
+      const textOf = (o) => lang === 'vi' ? o.vi : o.zh;
+      const distractors = db.filter(x => x.id !== cw.id && textOf(x) !== textOf(cw)).sort(() => Math.random() - 0.5).slice(0, 3);
+      const ops = [cw].concat(distractors).sort(() => Math.random() - 0.5); 
+      const ans = document.getElementById('answer-area'); 
+      const sz = lang === 'zh' ? 'text-xl' : 'text-sm';
+      ops.forEach((o, i) => { 
+        const b = document.createElement('button'); 
+        b.dataset.correct = (o.id === cw.id) ? '1' : '0';
+        b.className = `w-full text-left p-3.5 rounded-2xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:border-brand font-semibold shadow-sm transition-all ${sz}`; 
+        b.innerHTML = `<span class="font-bold mr-2 text-brand text-sm">${i + 1}.</span> ${escapeHtml(textOf(o))}`; 
+        b.onclick = () => {
+          if (isAnswering) return;
+          isAnswering = true; 
+          const isC = (o.id === cw.id); 
+          Array.from(ans.children).forEach(btn => {
+            btn.disabled = true; 
+            if (btn.dataset.correct === '1') {
+              btn.className = `w-full text-left p-3.5 rounded-2xl border-2 border-green-500 bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-300 font-bold transition-all ${sz}`;
+            }
+          }); 
+          if (!isC) {
+            b.className = `w-full text-left p-3.5 rounded-2xl border-2 border-red-500 bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-bold shake transition-all ${sz}`;
+          }
+          processAnswer(isC, false, (Date.now() - qStartTime) / 1000);
+        }; 
+        ans.appendChild(b);
+      }); 
+    }
+
+    // Chấm câu gõ: 'correct' | 'near' (gần đúng, 80%) | 'wrong'
+    function judgeTyping(w, typed, mode) {
+      if (mode === 'pinyin') {
+        if (hasCJK(typed)) return normZh(typed) === normZh(w.zh) ? 'correct' : 'wrong'; // gõ luôn chữ Hán cũng đúng
+        const a = normPinyin(typed), b = normPinyin(w.pinyin);
+        if (a && a === b) return 'correct';
+        return (a && similarity(a, b) >= TYPO_THRESHOLD) ? 'near' : 'wrong';
+      }
+      const a = normZh(typed), b = normZh(w.zh);
+      if (a === b) return 'correct';
+      if (hasCJK(a) && similarity(a, b) >= TYPO_THRESHOLD) return 'near';
+      if (ACCEPT_PINYIN_AT_L5 && !hasCJK(a) && w.pinyin && normPinyin(a) === normPinyin(w.pinyin)) return 'near';
+      return 'wrong';
+    }
+
+    function generateTypingInput(w, mode) { 
+      const ans = document.getElementById('answer-area'); 
+      const inp = document.createElement('input'); 
+      inp.type = "text"; 
+      inp.setAttribute('autocomplete', 'off'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('autocapitalize', 'off'); inp.spellcheck = false;
+      const sylCount = pinyinSyllables(w.pinyin).length || Array.from(w.zh).length;
+      inp.placeholder = mode === 'pinyin' ? `${normPinyin(w.pinyin).charAt(0)}... (${sylCount} âm tiết)` : "Gõ chữ Hán..."; 
+      inp.className = "w-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl px-5 py-3.5 text-center text-lg font-bold mb-3 focus:outline-none focus:border-brand shadow-sm"; 
+      const btn = document.createElement('button'); 
+      btn.innerText = "KIỂM TRA"; 
+      btn.className = "w-full bg-brand text-white font-bold py-3.5 rounded-2xl shadow-sm active:scale-95 transition-transform text-sm"; 
+      btn.onclick = () => {
+        if (isAnswering || !inp.value.trim()) return; 
+        isAnswering = true; 
+        inp.disabled = true; 
+        const t = (Date.now() - qStartTime) / 1000; 
+        const typed = inp.value.trim();
+        const verdict = judgeTyping(w, typed, mode);
+        const shown = mode === 'pinyin' ? w.pinyin : w.zh;
+        inp.value = shown;
+        if (verdict === 'correct') {
+          inp.className = "w-full border-2 border-green-500 bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded-2xl px-5 py-3.5 text-center text-lg font-bold mb-3 transition-colors shadow-sm"; 
+          processAnswer(true, false, t, typed);
+        } else if (verdict === 'near') {
+          // Gõ gần đúng: tính 80%, không bị coi là sai hẳn
+          inp.className = "w-full border-2 border-amber-500 bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-2xl px-5 py-3.5 text-center text-lg font-bold mb-3 transition-colors shadow-sm"; 
+          processAnswer(false, true, t, typed);
+        } else {
+          inp.className = "w-full border-2 border-red-500 bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-2xl px-5 py-3.5 text-center text-lg font-bold mb-3 shake transition-colors shadow-sm"; 
+          processAnswer(false, false, t, typed);
+        }
+      }; 
+      // Không nộp bài khi đang chọn chữ trong bộ gõ (IME)
+      inp.onkeydown = (e) => { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); btn.onclick(); } }; 
+      ans.appendChild(inp); 
+      ans.appendChild(btn); 
+      setTimeout(() => inp.focus(), 100);
+    }
+
+    function processAnswer(isC, isT, time, typed) { 
+      sessionStats.totalTime += time; 
+      const w = learningQueue[currentQIndex]; 
+      const idx = db.findIndex(x => x.id === w.id); 
+      const fb = document.getElementById('feedback-icon'); 
+      
+      let leveledUp = false, leveledDown = false;
+      let intervalFactor = 1; // hệ số nhân khoảng cách ôn lại (chỉ rút ngắn, không kéo dài)
+      if (isT) {
+        // Gần đúng: tính 80%, giữ nguyên cấp, ôn lại sớm hơn một chút
+        sessionStats.typo++;
+        sessionStats.correct += TYPO_SCORE;
+        fb.innerHTML = '<i class="fa-solid fa-face-meh text-amber-500"></i>'; 
+        playAudio(w.zh); 
+        intervalFactor = TYPO_SCORE;
+      } else if (isC) {
+        sessionStats.correct++; 
+        fb.innerHTML = '<i class="fa-solid fa-face-smile-beam text-green-500"></i>'; 
+        playAudio(w.zh); 
+        if (time < FAST_SECONDS && db[idx].level < 5) {
+          db[idx].level++; 
+          sessionStats.levelUps++;
+          leveledUp = true;
+        }
+        // Đúng nhưng chậm: trí nhớ còn yếu -> ôn lại sớm hơn (ôn khi sắp quên)
+        if (time >= FAST_SECONDS) intervalFactor = SLOW_FACTOR;
+      } else {
+        document.getElementById('flashcard').classList.add('shake'); 
+        fb.innerHTML = '<i class="fa-solid fa-face-frown-open text-red-500"></i>'; 
+        if (db[idx].level > 1) {
+          db[idx].level--;
+          leveledDown = true;
+        }
+      } 
+      
+      db[idx].nextReview = Date.now() + INTERVALS[db[idx].level] * intervalFactor; 
+      saveData();
+      
+      fb.classList.remove('opacity-0'); 
+      fb.classList.add('bounce-in'); 
+
+      // Hiện bảng phản hồi, chờ người dùng bấm TIẾP TỤC (không tự chuyển câu nữa)
+      showFeedbackSheet(w, isC, leveledUp, leveledDown, isT, (isC && !isT) ? '' : typed);
+    }
+
+    /* ===== BẢNG PHẢN HỒI ĐÚNG / SAI ===== */
+    let currentFeedbackWord = null;
+    let feedbackOpenedAt = 0;
+
+    function updateSheetHeart() {
+      const w = currentFeedbackWord && db.find(x => x.id === currentFeedbackWord.id);
+      const btn = document.getElementById('fs-heart');
+      if (!btn) return;
+      btn.innerHTML = (w && w.favorite)
+        ? '<i class="fa-solid fa-heart text-red-500"></i>'
+        : '<i class="fa-regular fa-heart text-red-400"></i>';
+    }
+
+    function toggleFavoriteInSheet() {
+      if (!currentFeedbackWord) return;
+      const w = db.find(x => x.id === currentFeedbackWord.id);
+      toggleFavorite(currentFeedbackWord.id);
+      updateSheetHeart();
+      if (w) showToast(w.favorite ? 'Đã thêm vào Yêu thích ❤' : 'Đã bỏ khỏi Yêu thích');
+    }
+
+    function showFeedbackSheet(word, isCorrect, leveledUp, leveledDown, isTypo, typed) {
+      const w = db.find(x => x.id === word.id) || word;
+      currentFeedbackWord = w;
+
+      const sheet = document.getElementById('feedback-sheet');
+      const inner = document.getElementById('feedback-sheet-inner');
+      const btn = document.getElementById('fs-continue');
+      const title = document.getElementById('fs-title');
+      const base = "transition-transform duration-300 ease-out rounded-t-3xl border-t-4 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-5 pt-4 pb-5 translate-y-full";
+      const btnBase = "w-full text-white font-extrabold py-3.5 rounded-2xl shadow-md active:scale-95 transition-transform text-sm tracking-wide";
+
+      if (isTypo) {
+        inner.className = base + " bg-amber-100 border-amber-500 dark:bg-amber-950 dark:border-amber-600";
+        title.className = "text-lg font-extrabold flex-1 text-amber-700 dark:text-amber-300";
+        title.innerText = "Gần đúng! (80%)";
+        document.getElementById('fs-icon').innerHTML = '<i class="fa-solid fa-circle-exclamation text-amber-500"></i>';
+        btn.className = btnBase + " bg-amber-500 hover:bg-amber-600";
+      } else if (isCorrect) {
+        inner.className = base + " bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-600";
+        title.className = "text-lg font-extrabold flex-1 text-green-700 dark:text-green-300";
+        title.innerText = "Chính xác!";
+        document.getElementById('fs-icon').innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i>';
+        btn.className = btnBase + " bg-green-500 hover:bg-green-600";
+      } else {
+        inner.className = base + " bg-red-100 border-red-500 dark:bg-red-950 dark:border-red-600";
+        title.className = "text-lg font-extrabold flex-1 text-red-700 dark:text-red-300";
+        title.innerText = "Chưa đúng, đáp án là:";
+        document.getElementById('fs-icon').innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i>';
+        btn.className = btnBase + " bg-red-500 hover:bg-red-600";
+      }
+
+      // Badge thay đổi cấp độ
+      const lv = document.getElementById('fs-level');
+      const lvBase = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/70 dark:bg-gray-900/40 ";
+      if (leveledUp) { lv.innerText = `⬆ Lên cấp ${w.level}`; lv.className = lvBase + "text-green-700 dark:text-green-300"; }
+      else if (leveledDown) { lv.innerText = `⬇ Xuống cấp ${w.level}`; lv.className = lvBase + "text-red-700 dark:text-red-300"; }
+      else if (isTypo) { lv.innerText = `= Giữ cấp ${w.level}`; lv.className = lvBase + "text-amber-700 dark:text-amber-300"; }
+      else { lv.className = "hidden"; }
+
+      const typedEl = document.getElementById('fs-typed');
+      if (typed) {
+        typedEl.innerHTML = `Bạn gõ: <span class="font-bold line-through decoration-2">${escapeHtml(typed)}</span>`;
+        typedEl.classList.remove('hidden');
+      } else {
+        typedEl.classList.add('hidden');
+      }
+
+      document.getElementById('fs-zh').innerHTML = renderZhHtml(w.zh, w.pinyin);
+      document.getElementById('fs-pinyin').innerHTML = renderPinyinHtml(w.pinyin);
+      const hvEl = document.getElementById('fs-hv');
+      if (w.hv) { hvEl.innerText = `Hán Việt: ${w.hv}`; hvEl.classList.remove('hidden'); } else { hvEl.classList.add('hidden'); }
+      document.getElementById('fs-vi').innerText = w.vi;
+
+      const exBox = document.getElementById('fs-example');
+      if (w.exampleZh) {
+        document.getElementById('fs-example-zh').innerHTML = highlightZh(w.exampleZh, w.zh);
+        document.getElementById('fs-example-pinyin').innerHTML = renderPinyinHtml(w.examplePinyin);
+        document.getElementById('fs-example-vi').innerText = w.exampleVi || '';
+        exBox.classList.remove('hidden');
+      } else {
+        exBox.classList.add('hidden');
+      }
+
+      updateSheetHeart();
+
+      document.getElementById('feedback-spacer').classList.remove('hidden');
+      sheet.classList.remove('hidden');
+      feedbackOpenedAt = Date.now();
+      // Trượt từ dưới lên
+      requestAnimationFrame(() => requestAnimationFrame(() => inner.classList.remove('translate-y-full')));
+    }
+
+    function hideFeedbackSheet() {
+      document.getElementById('feedback-sheet').classList.add('hidden');
+      document.getElementById('feedback-spacer').classList.add('hidden');
+      currentFeedbackWord = null;
+    }
+
+    function continueAfterFeedback() {
+      if (!currentFeedbackWord) return;
+      hideFeedbackSheet();
+      document.getElementById('flashcard').classList.remove('shake'); 
+      currentQIndex++; 
+      if (currentQIndex < sessionStats.total) loadQuestion(); 
+      else finishLearning();
+    }
+
+    // Nhấn Enter để TIẾP TỤC (trên máy tính)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && currentFeedbackWord && Date.now() - feedbackOpenedAt > 350) {
+        e.preventDefault();
+        continueAfterFeedback();
+      }
+    });
+
+    function finishLearning() { 
+      document.getElementById('view-learning').classList.add('hidden'); 
+      document.getElementById('view-learning').classList.remove('flex'); 
+      const sum = document.getElementById('view-summary'); 
+      sum.classList.remove('hidden'); 
+      sum.classList.add('flex'); 
+      document.getElementById('sum-accuracy').innerText = `${sessionStats.total ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0}%`; 
+      document.getElementById('sum-speed').innerText = `${sessionStats.total ? (sessionStats.totalTime / sessionStats.total).toFixed(1) : 0}s`; 
+      document.getElementById('sum-levelup').innerText = `+${sessionStats.levelUps}`; 
+      saveData(); 
+    }
+
+    function saveExerciseSession() {
+      if (!dailyExerciseData || !dailyExerciseWords || dailyExerciseWords.length === 0) return;
+
+      const clozeState = [];
+      document.querySelectorAll('.cloze-input').forEach(input => {
+        clozeState.push({
+          id: input.id,
+          val: input.value,
+          correct: input.classList.contains('correct'),
+          wrong: input.classList.contains('wrong'),
+          readOnly: input.readOnly
+        });
+      });
+
+      const btnCheck = document.getElementById('btn-check-cloze');
+      const isClozeFinished = btnCheck ? btnCheck.innerHTML.includes('HOÀN THÀNH') : false;
+
+      const writingInput = document.getElementById('writing-input').value;
+      const writingFeedbackArea = document.getElementById('writing-feedback-area');
+      const writingFbHidden = writingFeedbackArea ? writingFeedbackArea.classList.contains('hidden') : true;
+      const feedbackTitle = document.getElementById('feedback-title')?.innerHTML || '';
+      const feedbackText = document.getElementById('feedback-text')?.innerText || '';
+      const feedbackCorrection = document.getElementById('feedback-correction')?.innerHTML || '';
+      const fbClassName = writingFeedbackArea ? writingFeedbackArea.className : '';
+
+      const transDiv = document.getElementById('exercise-translation');
+      const translationVisible = transDiv ? !transDiv.classList.contains('hidden') : false;
+
+      const session = {
+        words: dailyExerciseWords,
+        data: dailyExerciseData,
+        clozeState,
+        isClozeFinished,
+        writingInput,
+        writingFeedback: writingFbHidden ? null : {
+          title: feedbackTitle,
+          text: feedbackText,
+          correction: feedbackCorrection,
+          className: fbClassName
+        },
+        translationVisible
+      };
+
+      localStorage.setItem('baobao_ai_exercise_session', JSON.stringify(session));
+    }
+
+    function loadExerciseSession() {
+      const stored = localStorage.getItem('baobao_ai_exercise_session');
+      if (!stored) return false;
+      try {
+        const session = JSON.parse(stored);
+        if (!session || !session.data || !session.words || session.words.length === 0) return false;
+
+        dailyExerciseWords = session.words;
+        dailyExerciseData = session.data;
+
+        const listEl = document.getElementById('exercise-word-list');
+        if (listEl) {
+          listEl.innerHTML = dailyExerciseWords.map(w => 
+            `<span class="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm shadow-sm">${escapeHtml(w.zh)}</span>`
+          ).join('');
+        }
+
+        renderClozeTest();
+
+        if (session.clozeState && session.clozeState.length) {
+          session.clozeState.forEach(item => {
+            const inp = document.getElementById(item.id);
+            if (inp) {
+              inp.value = item.val || '';
+              inp.style.width = clozeWidth(Math.max(Array.from(inp.value).length, Array.from(inp.dataset.answer || '').length));
+              if (item.correct) inp.classList.add('correct');
+              if (item.wrong) inp.classList.add('wrong');
+              if (item.readOnly) inp.readOnly = true;
+            }
+          });
+        }
+
+        if (session.isClozeFinished) {
+          const btnCheck = document.getElementById('btn-check-cloze');
+          if (btnCheck) {
+            btnCheck.innerHTML = '<i class="fa-solid fa-check"></i> HOÀN THÀNH';
+            btnCheck.className = "w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-sm mb-4";
+            btnCheck.onclick = null;
+          }
+        }
+
+        if (session.translationVisible) {
+          toggleExerciseTranslation();
+        }
+
+        if (session.writingInput) {
+          document.getElementById('writing-input').value = session.writingInput;
+        }
+
+        if (session.writingFeedback) {
+          const fbArea = document.getElementById('writing-feedback-area');
+          fbArea.classList.remove('hidden');
+          fbArea.className = session.writingFeedback.className;
+          document.getElementById('feedback-title').innerHTML = session.writingFeedback.title;
+          document.getElementById('feedback-text').innerText = session.writingFeedback.text;
+          document.getElementById('feedback-correction').innerHTML = session.writingFeedback.correction;
+        }
+
+        return true;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    async function openDailyExercise() {
+      const apiKey = localStorage.getItem('baobao_gemini_key');
+      const hasSavedSession = !!localStorage.getItem('baobao_ai_exercise_session');
+
+      if (!apiKey && !hasSavedSession) {
+        showToast('Vui lòng cài đặt Gemini API Key để dùng tính năng này!', true);
+        openAISettingsModal();
+        return;
+      }
+
+      if (db.length < 3) {
+        showToast('Sổ từ vựng của bạn cần ít nhất 3 từ để làm bài tập!', true);
+        return;
+      }
+
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const viewExercise = document.getElementById('view-daily-exercise');
+      viewExercise.classList.remove('hidden');
+      viewExercise.classList.add('flex');
+
+      const restored = loadExerciseSession();
+      if (restored) {
+        document.getElementById('exercise-loading').classList.remove('flex');
+        document.getElementById('exercise-loading').classList.add('hidden');
+        document.getElementById('exercise-content').classList.remove('hidden');
+        return;
+      }
+
+      if (!apiKey) {
+        showToast('Vui lòng cài đặt Gemini API Key để tạo bài tập mới!', true);
+        openAISettingsModal();
+        return;
+      }
+
+      dailyExerciseWords = pickExerciseWords(10);
+
+      await triggerAIGeneration(apiKey);
+    }
+
+    async function refreshDailyExercise() {
+      const apiKey = localStorage.getItem('baobao_gemini_key');
+      if (!apiKey) {
+        showToast('Vui lòng cài đặt Gemini API Key!', true);
+        openAISettingsModal();
+        return;
+      }
+
+      localStorage.removeItem('baobao_ai_exercise_session');
+      
+      const btnRefresh = document.getElementById('btn-refresh-exercise');
+      btnRefresh.querySelector('i').classList.add('fa-spin');
+      
+      dailyExerciseWords = pickExerciseWords(10);
+
+      await triggerAIGeneration(apiKey);
+      
+      btnRefresh.querySelector('i').classList.remove('fa-spin');
+    }
+
+    async function triggerAIGeneration(apiKey) {
+      document.getElementById('exercise-content').classList.add('hidden');
+      document.getElementById('exercise-loading').classList.remove('hidden');
+      document.getElementById('exercise-loading').classList.add('flex');
+      
+      const listEl = document.getElementById('exercise-word-list');
+      listEl.innerHTML = dailyExerciseWords.map(w => 
+        `<span class="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm shadow-sm">${escapeHtml(w.zh)}</span>`
+      ).join('');
+
+      await generateAIParagraph(apiKey);
+    }
+
+    function closeDailyExercise() {
+      document.getElementById('view-daily-exercise').classList.add('hidden');
+      document.getElementById('view-daily-exercise').classList.remove('flex');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+    }
+
+    async function generateAIParagraph(apiKey) {
+      const wordListString = dailyExerciseWords.map(w => w.zh).join('、');
+      const prompt = `
+Bạn là giáo viên tiếng Trung xuất sắc, dạy cho người Việt. Tôi có danh sách từ vựng sau: [${wordListString}].
+Nhiệm vụ của bạn:
+1. Viết một đoạn văn tiếng Trung giản thể ngắn gọn, tự nhiên (khoảng 60-100 chữ Hán, trình độ sơ-trung cấp, dễ hiểu), kể một câu chuyện hoặc mô tả một tình huống CÓ CHỨA CÁC TỪ VỰNG NÀY.
+2. Mỗi khi một từ trong danh sách xuất hiện trong đoạn văn, hãy đặt nguyên từ đó giữa hai cặp ngoặc vuông, ví dụ: 我有很多[[朋友]]。 Chỉ đánh dấu đúng các từ trong danh sách, giữ nguyên chữ Hán của từ, không đánh dấu thêm từ nào khác.
+3. Viết pinyin có dấu thanh cho toàn bộ đoạn văn (không kèm dấu ngoặc vuông).
+4. Dịch đoạn văn sang tiếng Việt.
+
+Trả về duy nhất JSON:
+{
+  "paragraph_zh": "đoạn văn tiếng Trung có đánh dấu [[từ]]",
+  "paragraph_pinyin": "pinyin của cả đoạn",
+  "paragraph_vi": "bản dịch tiếng Việt",
+  "words_used_in_text": ["từ 1", "từ 2"]
+}
+`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
+
+        if (!res.ok) throw new Error("Lỗi Key/API");
+        const result = await res.json();
+        
+        let jsonStr = cleanJsonString(result.candidates[0].content.parts[0].text);
+        dailyExerciseData = JSON.parse(jsonStr);
+        if (!dailyExerciseData.paragraph_zh) throw new Error("Thiếu đoạn văn");
+
+        renderClozeTest();
+        saveExerciseSession();
+
+      } catch (err) {
+        showToast('Lỗi khi tạo bài tập. Vui lòng thử lại!', true);
+        closeDailyExercise();
+      }
+    }
+
+    // Chữ Hán rộng khoảng 2 ký tự Latin
+    function clozeWidth(len) { return Math.max(len * 2, 4) + 'ch'; }
+
+    function renderClozeTest() {
+      document.getElementById('exercise-loading').classList.remove('flex');
+      document.getElementById('exercise-loading').classList.add('hidden');
+      document.getElementById('exercise-content').classList.remove('hidden');
+
+      const transEl = document.getElementById('exercise-translation');
+      transEl.classList.add('hidden');
+      document.getElementById('trans-icon').className = "fa-solid fa-eye-slash";
+      document.getElementById('trans-text').innerText = "Hiện pinyin & bản dịch";
+      transEl.innerHTML = `<div class="text-sm leading-relaxed mb-2 font-semibold">${renderPinyinHtml(dailyExerciseData.paragraph_pinyin)}</div><div>${escapeHtml(dailyExerciseData.paragraph_vi)}</div>`;
+      document.getElementById('writing-input').value = '';
+      document.getElementById('writing-feedback-area').classList.add('hidden');
+      
+      const raw = dailyExerciseData.paragraph_zh || '';
+      let counter = 0;
+      const makeInput = (answer) => {
+        const inputId = `cloze-${counter++}`;
+        return `<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="cloze-input" id="${inputId}" data-answer="${escapeHtml(answer)}" style="width: ${clozeWidth(Array.from(answer).length)};" />`;
+      };
+
+      let htmlText;
+      if (/\[\[.+?\]\]/.test(raw)) {
+        // AI đã tự đánh dấu [[từ]] -> đục lỗ chính xác, không bị lẫn vào từ khác
+        htmlText = raw.split(/(\[\[.+?\]\])/g).map(part => {
+          const m = part.match(/^\[\[(.+?)\]\]$/);
+          return m ? makeInput(m[1]) : escapeHtml(part);
+        }).join('');
+      } else {
+        // Dự phòng: dựa vào danh sách từ AI báo lại
+        const words = [...new Set((dailyExerciseData.words_used_in_text || []).filter(Boolean))].sort((a, b) => b.length - a.length);
+        if (words.length) {
+          const re = new RegExp(`(${words.map(w => escapeRegExp(w)).join('|')})`, 'g');
+          htmlText = raw.split(re).map((part, i) => (i % 2 === 1) ? makeInput(part) : escapeHtml(part)).join('');
+        } else {
+          htmlText = escapeHtml(raw);
+        }
+      }
+
+      document.getElementById('cloze-paragraph').innerHTML = htmlText;
+
+      document.querySelectorAll('.cloze-input').forEach(input => {
+        input.addEventListener('input', function() {
+          this.style.width = clozeWidth(Math.max(Array.from(this.value).length, Array.from(this.dataset.answer).length));
+          this.classList.remove('wrong', 'correct');
+          saveExerciseSession();
+        });
+      });
+      
+      const btnCheck = document.getElementById('btn-check-cloze');
+      btnCheck.innerHTML = 'KIỂM TRA ĐÁP ÁN';
+      btnCheck.onclick = checkClozeTest;
+      btnCheck.className = "w-full bg-brand text-white font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform mb-4";
+    }
+
+    function checkClozeTest() {
+      const inputs = document.querySelectorAll('.cloze-input');
+      let allCorrect = true;
+
+      inputs.forEach(input => {
+        const userAnswer = normZh(input.value);
+        const correctAnswer = normZh(input.dataset.answer);
+
+        if (userAnswer === correctAnswer) {
+          input.classList.remove('wrong');
+          input.classList.add('correct');
+          input.readOnly = true;
+        } else {
+          input.classList.remove('correct');
+          input.classList.add('wrong');
+          allCorrect = false;
+        }
+      });
+
+      if (allCorrect) {
+        showToast('Xuất sắc! Bạn đã điền đúng tất cả!');
+        const btnCheck = document.getElementById('btn-check-cloze');
+        btnCheck.innerHTML = '<i class="fa-solid fa-check"></i> HOÀN THÀNH';
+        btnCheck.className = "w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-sm mb-4";
+        btnCheck.onclick = null;
+      } else {
+        showToast('Có chỗ sai, hãy kiểm tra lại những từ màu đỏ nhé!', true);
+      }
+
+      saveExerciseSession();
+    }
+
+    function toggleExerciseTranslation() {
+      const transDiv = document.getElementById('exercise-translation');
+      const icon = document.getElementById('trans-icon');
+      const text = document.getElementById('trans-text');
+
+      if (transDiv.classList.contains('hidden')) {
+        transDiv.classList.remove('hidden');
+        icon.className = "fa-solid fa-eye";
+        text.innerText = "Ẩn pinyin & bản dịch";
+      } else {
+        transDiv.classList.add('hidden');
+        icon.className = "fa-solid fa-eye-slash";
+        text.innerText = "Hiện pinyin & bản dịch";
+      }
+
+      saveExerciseSession();
+    }
+
+    function playExerciseAudio() {
+      playAudio(dailyExerciseData.paragraph_zh);
+    }
+
+    async function submitWritingTask() {
+      const userText = document.getElementById('writing-input').value.trim();
+      if (!userText) {
+        showToast('Bạn chưa viết câu nào cả!', true);
+        return;
+      }
+
+      const apiKey = localStorage.getItem('baobao_gemini_key');
+      if (!apiKey) {
+        openAISettingsModal();
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-writing');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG CHẤM...';
+
+      const wordListString = dailyExerciseWords.map(w => w.zh).join('、');
+      const prompt = `
+Học viên người Việt vừa viết bằng tiếng Trung: "${userText}".
+Danh sách từ đang học: [${wordListString}].
+Hãy chấm điểm (ngữ pháp, dùng từ, độ tự nhiên, có dùng các từ đang học hay không) và trả về duy nhất JSON:
+{
+  "score": "0-10",
+  "status": "Perfect" hoặc "Needs Improvement",
+  "feedback_vi": "Nhận xét ngắn bằng tiếng Việt, nêu rõ lỗi sai nếu có",
+  "corrected_zh": "Câu tiếng Trung giản thể đã sửa",
+  "corrected_pinyin": "Pinyin có dấu thanh của câu đã sửa, tách từng âm tiết bằng dấu cách"
+}
+`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
+
+        if (!res.ok) throw new Error("API Limit");
+        const result = await res.json();
+        
+        let jsonStr = cleanJsonString(result.candidates[0].content.parts[0].text);
+        const feedback = JSON.parse(jsonStr);
+
+        const fbArea = document.getElementById('writing-feedback-area');
+        fbArea.classList.remove('hidden');
+        
+        const isPerfect = String(feedback.status || '').toLowerCase().includes('perfect');
+        fbArea.className = `mt-4 p-4 rounded-xl border ${isPerfect ? 'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800' : 'bg-orange-50 border-orange-200 dark:bg-orange-900/30 dark:border-orange-800'}`;
+        
+        document.getElementById('feedback-title').innerHTML = isPerfect ? 
+          `<i class="fa-solid fa-star text-emerald-500"></i> <span class="text-green-700 dark:text-green-400">${escapeHtml(feedback.score)}/10 - Rất tốt!</span>` :
+          `<i class="fa-solid fa-pen-ruler text-orange-500"></i> <span class="text-orange-700 dark:text-orange-400">${escapeHtml(feedback.score)}/10 - Cần chỉnh sửa</span>`;
+          
+        document.getElementById('feedback-text').innerText = feedback.feedback_vi;
+        document.getElementById('feedback-correction').innerHTML = `<span class="text-xs text-gray-500 block mb-1">Gợi ý sửa lại:</span><span class="font-bold text-lg text-gray-800 dark:text-gray-100 block">${escapeHtml(feedback.corrected_zh)}</span><span class="text-sm font-semibold block mt-0.5">${renderPinyinHtml(feedback.corrected_pinyin)}</span>`;
+
+        showToast('Đã nhận được đánh giá từ AI!');
+        saveExerciseSession();
+
+      } catch (err) {
+        showToast('Lỗi khi chấm bài. Thử lại sau nhé!', true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-spell-check"></i> CHẤM ĐIỂM';
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      if (isError) toastIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-400"></i>';
+      else toastIcon.innerHTML = '<i class="fa-solid fa-bell text-brand"></i>';
+
+      toast.classList.remove('-translate-y-full', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-full', 'opacity-0');
+      }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      applySavedTheme();
+      updateToneColorUI();
+      loadData();
+      await initServiceWorker(); 
+      initNotificationSystem();
+      initDashboard();
+    });
+  </script>
+</body>
+</html>

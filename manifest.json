@@ -1,0 +1,13 @@
+{
+  "name": "Baobao Life",
+  "short_name": "Baobao Life",
+  "description": "Học từ vựng tiếng Trung theo ngữ cảnh",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fcfcfc",
+  "theme_color": "#10b981",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
